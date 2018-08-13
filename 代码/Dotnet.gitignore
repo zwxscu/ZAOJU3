@@ -1,0 +1,9 @@
+#C#
+.svn
+x86
+obj
+*.dll
+*.cache
+*.pdb
+*.exe
+*.suo

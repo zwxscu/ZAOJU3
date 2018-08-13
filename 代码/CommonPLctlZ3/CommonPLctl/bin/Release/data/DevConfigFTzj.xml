@@ -1,0 +1,285 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ProcessCfg>
+  <sysSet>
+    <RunMode sim="true" mesTestMode="false">仿真运行模式</RunMode>
+    <Printer Enable="True" >是否启动自动贴标</Printer>
+    <Mes Enable="True" OfflineMode="False">是否启动MES判断</Mes>
+    
+    <!--MES下线查询最长时间-->
+    <MesDownTimeout>20</MesDownTimeout>
+    
+    <!--RFID失败判断，最长允许时间-->
+    <RfidTimeout>15</RfidTimeout>
+    <!--线体控制，速度，启动/停止-->
+    <LineCtl addrStart="D4000" blockNum="3">线体控制</LineCtl>
+  </sysSet>
+    <!--通信设备配置-->
+  <CommDevCfg>
+    <ComPort>
+      <!--<Port id="1">COM1</Port>
+      <Port id="2">COM2</Port>
+      <Port id="3">COM3</Port>
+      <Port id="4">COM4</Port>
+      <Port id="5">COM5</Port>
+      <Port id="6">COM6</Port>
+      <Port id="7">COM7</Port>
+      <Port id="8">COM8</Port>
+      <Port id="9">COM9</Port>
+      <Port id="10">COM10</Port>
+      <Port id="11">COM11</Port>
+      <Port id="12">COM12</Port>
+      <Port id="13">COM13</Port>
+      <Port id="14">COM14</Port>-->
+   
+    </ComPort>
+    <PLCCfg>
+      <PLCVendor>三菱Q</PLCVendor>
+      <PLCAddr>192.168.1.100:7000</PLCAddr>
+    </PLCCfg>
+    <!--思谷RFID配置-->
+    <SgRfidCfg CommType="TCPIP">
+      <RFID id="1" CommAddr="192.168.1.10">投产位</RFID>
+      <RFID id="2" CommAddr="192.168.1.11">气密1</RFID>
+      <RFID id="3" CommAddr="192.168.1.12">气密2</RFID>
+      <RFID id="4" CommAddr ="192.168.1.13">气密3</RFID>
+      <RFID id="5" CommAddr ="192.168.1.14">零秒点火</RFID>
+      <RFID id="6" CommAddr ="192.168.1.15">一次试火1</RFID>
+      <RFID id="7" CommAddr ="192.168.1.16">一次试火2</RFID>
+      <RFID id="8" CommAddr ="192.168.1.17">一次试火3</RFID>
+      <RFID id="9" CommAddr ="192.168.1.18">一次试火4</RFID>
+      <RFID id="10" CommAddr ="192.168.1.19">二次试火1</RFID>
+      <RFID id="11" CommAddr ="192.168.1.20">二次试火2</RFID>
+      <RFID id="12" CommAddr ="192.168.1.21">外观检查</RFID>
+      <!--<RFID id="0" CommAddr="COM18">提前下线</RFID>-->
+      <RFID id="13" CommAddr="192.168.1.22">装箱核对</RFID>
+    </SgRfidCfg>
+    <BarScannerCfg>
+      <BarScanner id="1" CommAddr="COM8"></BarScanner>
+      <BarScanner id="2" CommAddr="COM12"></BarScanner>
+      <BarScanner id="3" CommAddr="COM13"></BarScanner>
+    </BarScannerCfg>
+    <AircheckMachineCfg>
+      <AircheckMachine id="1" CommAddr ="COM9">气密检查设备1</AircheckMachine>
+      <AircheckMachine id="2" CommAddr ="COM10">气密检查设备2</AircheckMachine>
+      <AircheckMachine id="3" CommAddr ="COM11">气密检查设备3</AircheckMachine>
+    </AircheckMachineCfg>
+    <LabelPrinterCfg>
+      <LabelPrinter id="1" ip="192.168.1.251" dbName="YIBIN"  user="sa"  pswd="123456" port ="10002">贴标机</LabelPrinter>
+    </LabelPrinterCfg>
+  </CommDevCfg>
+  <CtlNodes dllName="LineNodesFTzj.dll">
+    <NodeFactory className="LineNodes.NodeFactory" CreatorMethod="GenerateNodes"></NodeFactory>
+    <Node className="LineNodes.ProductInput" id="1001">
+      <BaseDatainfo>
+        <NodeName>产品上线</NodeName>
+       
+        <DB1Addr addrStart="D2000" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3000" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+        <Rfid id="1"></Rfid>
+        <BarScanner id="1"></BarScanner>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeAirlossCheck" id="2001">
+      <BaseDatainfo>
+        <NodeName>气密检查1</NodeName>
+        <MESDef id="RQ-ZA230" name="L46-气密检查1"/>
+        <DB1Addr addrStart="D2040" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3005" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="2"></Rfid>
+         <AircheckMachine id="1" detectTimeOut ="15000"></AircheckMachine>
+         <DeftectCode>06074</DeftectCode>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeAirlossCheck" id="2002">
+      <BaseDatainfo>
+        <NodeName>气密检查2</NodeName>
+        <MESDef id="RQ-ZA240" name="L46-气密检查2"/>
+        <DB1Addr addrStart="D2080" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3010" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="3"></Rfid>
+         <AircheckMachine id="2"  detectTimeOut ="15000"></AircheckMachine>
+        <DeftectCode>06075</DeftectCode>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeAirlossCheck" id="2003">
+      <BaseDatainfo>
+        <NodeName>气密检查3</NodeName>
+        <MESDef id="RQ-ZA240" name="L46-气密检查2"/>
+        <DB1Addr addrStart="D2120" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3015" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="4"></Rfid>
+         <AircheckMachine id="3"  detectTimeOut ="15000"></AircheckMachine>
+        <DeftectCode>06076</DeftectCode>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFireZero" id="3001">
+      <BaseDatainfo>
+        <NodeName>零秒点火</NodeName>
+        <MESDef id="RQ-ZA220" name="L46-无等待点火"/>
+        <DB1Addr addrStart="D2160" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3020" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="5"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFireTryingA" id="4001">
+      <BaseDatainfo>
+        <NodeName>一次试火:1</NodeName>
+        <MESDef id="RQ-ZA250" name="L46-试火#1"/>
+        <DB1Addr addrStart="D2200" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3025" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="6"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFireTryingA" id="4002">
+      <BaseDatainfo>
+        <NodeName>一次试火:2</NodeName>
+        <MESDef id="RQ-ZA251" name="L46-试火#2"/>
+        <DB1Addr addrStart="D2240" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3030" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="7"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFireTryingA" id="4003">
+      <BaseDatainfo>
+        <NodeName>一次试火:3</NodeName>
+        <MESDef id="RQ-ZA252" name="L46-试火#3"/>
+        <DB1Addr addrStart="D2280" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3035" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="8"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFireTryingA" id="4004">
+      <BaseDatainfo>
+        <NodeName>一次试火:4</NodeName>
+        <MESDef id="RQ-ZA254" name="L46-试火#4"/>
+        <DB1Addr addrStart="D2320" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3040" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="9"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFireTryingB" id="5001">
+      <BaseDatainfo>
+        <NodeName>二次试火:1</NodeName>
+        <MESDef id="RQ-ZA260" name="L46-二道试火#1"/>
+        <DB1Addr addrStart="D2360" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3045" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="10"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFireTryingB" id="5002">
+      <BaseDatainfo>
+        <NodeName>二次试火:2</NodeName>
+        <MESDef id="RQ-ZA260" name="L46-二道试火#2"/>
+        <DB1Addr addrStart="D2560" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3070" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="10"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <Node className="LineNodes.NodeFaceCheck" id="6001">
+      <BaseDatainfo>
+        <NodeName>外观检查</NodeName>
+        <MESDef id="RQ-ZA270" name="L46-外观检测"/>
+        <DB1Addr addrStart="D2400" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3050" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="11"></Rfid>
+      </SelfDatainfo>
+    </Node>
+    <!--<Node className="LineNodes.NodeProductSwitch" id="7001">
+      <BaseDatainfo>
+        <NodeName>产品提前下线</NodeName>
+        <MESDef id="RQ-ZA080" name="L45-包装下线"/>
+        <DB1Addr addrStart="D2440" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3055" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="12"></Rfid>
+         <LabelPrinter id="1"></LabelPrinter>
+      </SelfDatainfo>
+    </Node>-->
+    <Node className="LineNodes.NodePack" id="8001">
+      <BaseDatainfo>
+        <NodeName>装箱核对</NodeName>
+        <MESDef id="RQ-ZA280" name="L46-包装下线点"/>
+        <DB1Addr addrStart="D2480" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3060" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+         <Rfid id="13"></Rfid>
+         <BarScanner id="2"></BarScanner>
+      </SelfDatainfo>
+    </Node>
+   
+    <Node className="LineNodes.NodeRobotPallet" id="9001">
+      <BaseDatainfo>
+        <NodeName>机器人码垛</NodeName>
+        <DB1Addr addrStart="D2520" blockNum="40">DB1数据区地址信息</DB1Addr>
+        <DB2Addr addrStart="D3065" blockNum="5">DB2数据区地址信息</DB2Addr>
+      </BaseDatainfo>
+      <SelfDatainfo>
+        <BarScanner id="3"></BarScanner>
+      </SelfDatainfo>
+    </Node>
+  </CtlNodes>
+  <!--操作系统任务线程分配-->
+  <ThreadAlloc>
+    <Thread id="1" name ="线程1" loopInterval="100">
+      <NodeContainer>
+        <NodeID>1001</NodeID>
+        <NodeID>2001</NodeID>
+      </NodeContainer>
+    </Thread>
+    <Thread id="2"  name ="线程2" loopInterval="100">
+      <NodeContainer>
+        <NodeID>2002</NodeID>
+        <NodeID>2003</NodeID>
+        <NodeID>3001</NodeID>
+      </NodeContainer>
+    </Thread>
+    <Thread id="3"  name ="线程3" loopInterval="100">
+      <NodeContainer>
+        <NodeID>4001</NodeID>
+        <NodeID>4002</NodeID>
+        <NodeID>4003</NodeID>
+        <NodeID>4004</NodeID>
+      </NodeContainer>
+    </Thread>
+    <Thread id="4"  name ="线程4" loopInterval="100">
+      <NodeContainer>
+        <NodeID>5001</NodeID>
+        <NodeID>5002</NodeID>
+        <NodeID>6001</NodeID>
+        <!--<NodeID>7001</NodeID>-->
+      </NodeContainer>
+    </Thread>
+    <Thread id="5"  name ="线程5" loopInterval="100">
+      <NodeContainer>
+        <NodeID>8001</NodeID>
+        <NodeID>9001</NodeID>
+      </NodeContainer>
+    </Thread>
+  </ThreadAlloc>
+</ProcessCfg>

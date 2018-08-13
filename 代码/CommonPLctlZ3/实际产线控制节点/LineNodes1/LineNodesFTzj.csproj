@@ -1,0 +1,187 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{2C9E7C14-1ED2-440D-ABF4-DB6052010180}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LineNodes</RootNamespace>
+    <AssemblyName>LineNodesFTzj</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+    <WcfConfigValidationEnabled>True</WcfConfigValidationEnabled>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x86\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x86</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="DevAccess">
+      <HintPath>..\..\libReference\DevAccess.dll</HintPath>
+    </Reference>
+    <Reference Include="DevInterface">
+      <HintPath>..\..\libReference\DevInterface.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.ServiceModel" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="IView\ILineMonitorView.cs" />
+    <Compile Include="Model\NodeFaceCheck.cs" />
+    <Compile Include="Model\NodeFireTryingB.cs" />
+    <Compile Include="Model\NodeFireTryingA.cs" />
+    <Compile Include="Model\NodeFireZero.cs" />
+    <Compile Include="Model\NodePack.cs" />
+    <Compile Include="Model\NodeProductInput.cs" />
+    <Compile Include="Model\NodeAirlossCheck.cs" />
+    <Compile Include="Model\ViewThemColor.cs" />
+    <Compile Include="NodeFactory.cs" />
+    <Compile Include="Model\NodeRobotPallet.cs" />
+    <Compile Include="Presenter\LineMonitorPresenter.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="View\ClosingWaitDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\ClosingWaitDlg.designer.cs">
+      <DependentUpon>ClosingWaitDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\MyPanel.cs">
+      <SubType>Component</SubType>
+    </Compile>
+    <Compile Include="View\NodeMonitorView.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\NodeMonitorView.Designer.cs">
+      <DependentUpon>NodeMonitorView.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\PopupTipinfoDlg.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\PopupTipinfoDlg.Designer.cs">
+      <DependentUpon>PopupTipinfoDlg.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\UserControlCtlNode.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="View\UserControlCtlNode.Designer.cs">
+      <DependentUpon>UserControlCtlNode.cs</DependentUpon>
+    </Compile>
+    <Compile Include="View\WelcomeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="View\WelcomeForm.Designer.cs">
+      <DependentUpon>WelcomeForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="WcfSvc\INodeMonitorSvc.cs" />
+    <Compile Include="WcfSvc\NodeMonitorSvc.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\FTDataAccess\FTDataAccess.csproj">
+      <Project>{7031e95a-cbb5-44ae-aa9a-80211309981f}</Project>
+      <Name>FTDataAccess</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\ModuleAttachInterface\ModuleCrossPnP.csproj">
+      <Project>{8ebcda91-8a16-46fa-84bd-784982f9eac8}</Project>
+      <Name>ModuleCrossPnP</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PLProcessModel\PLProcessModel.csproj">
+      <Project>{178d26df-c682-42d8-aeab-c816111b69c6}</Project>
+      <Name>PLProcessModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\日志模块\LogInterface\LogInterface.csproj">
+      <Project>{f929e2c2-43ed-4d7e-8426-356b0ec3c540}</Project>
+      <Name>LogInterface</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="DevConfigFTzj.xml">
+      <SubType>Designer</SubType>
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="待解决问题.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="app.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\ClosingWaitDlg.resx">
+      <DependentUpon>ClosingWaitDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\NodeMonitorView.resx">
+      <DependentUpon>NodeMonitorView.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\PopupTipinfoDlg.resx">
+      <DependentUpon>PopupTipinfoDlg.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\UserControlCtlNode.resx">
+      <DependentUpon>UserControlCtlNode.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="View\WelcomeForm.resx">
+      <DependentUpon>WelcomeForm.cs</DependentUpon>
+    </EmbeddedResource>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>
