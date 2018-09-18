@@ -52,10 +52,14 @@ namespace ConfigManage
 
         private void buttonCfgApply_Click(object sender, EventArgs e)
         {
+            if(sysCfg.MesDownTimeout >20)
+            {
+                sysCfg.MesDownTimeout = 20;
+            }
             PLProcessModel.SysCfgModel.PrienterEnable = sysCfg.PrienterEnable;
             PLProcessModel.SysCfgModel.MesTimeout = sysCfg.MesDownTimeout;
             PLProcessModel.SysCfgModel.RfidDelayTimeout = sysCfg.RfidTimeout;
-            PLProcessModel.SysCfgModel. MesCheckEnable = sysCfg.MesEnable;
+            PLProcessModel.SysCfgModel.MesCheckEnable = sysCfg.MesEnable;
             PLProcessModel.SysCfgModel.MesOfflineMode = sysCfg.MesOfflineMode;
             string reStr = "";
             if(!PLProcessModel.SysCfgModel.SaveCfg(ref reStr))
