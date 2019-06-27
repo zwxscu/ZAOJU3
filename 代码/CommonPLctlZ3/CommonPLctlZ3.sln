@@ -39,9 +39,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FTPLRecordView", "FTPLRecor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemotMonitor", "RemotMonitor\RemotMonitor.csproj", "{7872F07A-E870-43B7-84C9-1650A8ECABAF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevAccess", "..\..\..\..\设备接口\设备及外部系统对接\DevAccess\DevAccess.csproj", "{C5F63C04-3B10-4FA9-96CA-226C4D405583}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevAccess", "设备及外部系统对接\DevAccess\DevAccess.csproj", "{C5F63C04-3B10-4FA9-96CA-226C4D405583}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevInterface", "..\..\..\..\设备接口\设备及外部系统对接\DevInterface\DevInterface.csproj", "{AE429508-4CB7-499E-88F0-C939496E7BEA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevInterface", "设备及外部系统对接\DevInterface\DevInterface.csproj", "{AE429508-4CB7-499E-88F0-C939496E7BEA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -97,6 +97,7 @@ namespace SygoleHFReaderIF
             this.dataLen = byteStream[5];
             if(byteStream.Count()<(7+this.dataLen))
             {
+                Console.WriteLine("(byteStream Len={0},dataLen={1}", byteStream.Count(), this.dataLen);
                 return false;
             }
             this.dataBuf = new byte[this.dataLen];
@@ -149,7 +150,7 @@ namespace SygoleHFReaderIF
         /// <summary>
         /// 根据当前发送的命令，生成期望接收到的字节长度
         /// </summary>
-        private byte expectedRecvLen = 0;
+        private byte expectedRecvLen =255;
 
         private Thread recvThread = null;
         private bool recvExit = false;
@@ -344,6 +345,12 @@ namespace SygoleHFReaderIF
                 }
             }
             return str;
+        }
+        public void ClearRecvBuffer()
+        {
+           
+            Array.Clear(recvBuffer, 0,recvBuffer.Length);
+            recvBufLen = 0;
         }
         public EnumREStatus ReadUserCfg(byte readerID,ref UserConfig cfg,ref byte[] recvByteArray)
         {
@@ -785,6 +792,52 @@ namespace SygoleHFReaderIF
         }
         public EnumREStatus GetUID(byte ReaderID,UserConfig userCfg,out byte[] UIDBytes)
         {
+            this.currentSndCmd = 1;
+            if(recvBufLen<15)
+            {
+               // Console.WriteLine("GetUID2,recvBufLen={0}",recvBufLen);
+                return GetUID2(ReaderID, userCfg, out UIDBytes);
+            }
+            else
+            {
+                Console.WriteLine("GetUID:接收缓存区长度：{0}",recvBufLen);
+                lock(recvBufLock)
+                {
+                    UIDBytes = null;
+                    EnumREStatus reStatus = EnumREStatus.RW_SUCCESS;
+                    RFPackage package = new RFPackage();
+                    if (package.ByteStream2Package(recvBuffer))
+                    {
+
+                        reStatus = RePackageCheck(package);
+                        if (reStatus != EnumREStatus.RW_SUCCESS)
+                        {
+
+                            Array.Clear(recvBuffer, 0, recvBuffer.Count());
+                            return reStatus;
+                        }
+                        if (package.DataStatus != 0x00)
+                        {
+                            Array.Clear(recvBuffer, 0, recvBuffer.Count());
+                            return EnumREStatus.RW_CMD_FAILED;
+                        }
+                        UIDBytes = new byte[8];
+                        Array.Copy(package.dataBuf, UIDBytes, Math.Min(8, package.dataBuf.Count()));
+                    }
+                    else
+                    {
+                        reStatus = EnumREStatus.RW_FAILURE;
+                    }
+                    // Array.Clear(recvBuffer, 0, recvBuffer.Count());
+                    // recvBufLen = 0;
+                    //responseOk = false;
+                    return reStatus;
+                }
+                
+            }
+        }
+        public EnumREStatus GetUID2(byte ReaderID,UserConfig userCfg,out byte[] UIDBytes)
+        {
              lock (sendLock)
              {
                  UIDBytes = null;
@@ -802,9 +855,14 @@ namespace SygoleHFReaderIF
                  package.dataLen = 0;
                 
                  package.Bcc = 0;
+                
                  byte[] byteStream = package.Package2Bytes();
-                 //发送之前清空接收缓冲区
-                 Array.Clear(recvBuffer, 0, recvBuffer.Count());
+                 lock (recvBufLock)
+                 {
+                     //发送之前清空接收缓冲区
+                     Array.Clear(recvBuffer, 0, recvBuffer.Count());
+                 }
+                
                  recvBufLen = 0;
                  recvBegin = false;
                  responseOk = false;
@@ -825,24 +883,28 @@ namespace SygoleHFReaderIF
                  if (!responseOk)
                  {
                      reStatus = EnumREStatus.RW_NO_RESPONSE;
-                     Console.WriteLine("接收超时");
+                  //   Console.WriteLine("接收超时");
                      return reStatus;
                  }
                  package = new RFPackage();
-                 if (package.ByteStream2Package(recvBuffer))
+                 lock (recvBufLock)
                  {
-                     reStatus = RePackageCheck(package);
-                     if (reStatus != EnumREStatus.RW_SUCCESS)
+                     if (package.ByteStream2Package(recvBuffer))
                      {
-                         return reStatus;
+                         reStatus = RePackageCheck(package);
+                         if (reStatus != EnumREStatus.RW_SUCCESS)
+                         {
+                             return reStatus;
+                         }
+                         if (package.DataStatus != 0x00)
+                         {
+                             return EnumREStatus.RW_CMD_FAILED;
+                         }
+                         UIDBytes = new byte[8];
+                         Array.Copy(package.dataBuf, UIDBytes, Math.Min(8, package.dataBuf.Count()));
                      }
-                     if (package.DataStatus != 0x00)
-                     {
-                         return EnumREStatus.RW_CMD_FAILED;
-                     }
-                     UIDBytes = new byte[8];
-                     Array.Copy(package.dataBuf, UIDBytes, Math.Min(8,package.dataBuf.Count()));
                  }
+                
                  return reStatus;
              }
         }
@@ -851,9 +913,9 @@ namespace SygoleHFReaderIF
         private EnumREStatus WaitRes(int timeOut)
         {
             DateTime st = System.DateTime.Now;
-            if (timeOut > 3000)
+            if (timeOut > 2000)
             {
-                timeOut = 3000;
+                timeOut = 2000;
             }
             while (true)
             {
@@ -911,14 +973,14 @@ namespace SygoleHFReaderIF
         {
             try
             {
-                lock(recvBufLock)
+                if (buf == null || buf.Count() < recvLen)
                 {
-                    if (buf == null || buf.Count() < recvLen)
-                    {
-                        reStr = "接收数据处理错误，数据长度参数和实际不一致";
-                        return false;
-                    }
-                    //开始解析接收到的数据
+                    reStr = "接收数据处理错误，数据长度参数和实际不一致";
+                    return false;
+                }
+                //开始解析接收到的数据
+                lock (recvBufLock)
+                {
                     for (int i = 0; i < recvLen; i++)
                     {
                         if (recvBufLen >= recvMax)
@@ -934,18 +996,28 @@ namespace SygoleHFReaderIF
                             recvBufLen = 0;
                             recvBegin = true;
                         }
+                        byte cmdCode = 0;
                         if (recvBegin)
                         {
                             recvBuffer[recvBufLen++] = buf[i];
+                            if(recvBufLen>1)
+                            {
+                                cmdCode = recvBuffer[1];
+                                if(cmdCode==1)
+                                {
+                                    expectedRecvLen = 15;
+                                }
+                            }
                         }
                         //当接收到的字节长度达到期望值后，解析
                         if (recvBufLen >= expectedRecvLen)
                         {
                             //解析数据包
-
+                            //if (cmdCode == 1)
+                            //{
+                            //    Console.WriteLine("端口{0}收到UID 长度:{1} 字节数组:{2}", this.ComPort, recvBufLen,bytes2hexString(recvBuffer, recvBufLen, 1));
+                            //}
                             recvBegin = false;
-
-                            recvBufLen = 0;
                             responseOk = true;
                             // recvAutoEvent.Set();
 
@@ -1060,7 +1132,7 @@ namespace SygoleHFReaderIF
             }
             catch (System.Exception ex)
             {
-                Console.WriteLine("接收杭可服务器数据出现异常:" + ex.Message);
+                Console.WriteLine("接收服务器数据出现异常:" + ex.Message);
                 isConnect = false;
             }
 
@@ -1096,6 +1168,27 @@ namespace SygoleHFReaderIF
                 return false;
             }
            
+        }
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="len"></param>
+        /// <param name="space">1:输出16进制字符加空格</param>
+        /// <returns></returns>
+        public static string bytes2hexString(byte[] data, int len, int space)
+        {
+            string str = "";
+            string str2 = "";
+            if (space == 1)
+            {
+                str2 = " ";
+            }
+            for (int i = 0; i < len; i++)
+            {
+                str = str + data[i].ToString("X") + str2;
+            }
+            return str;
         }
         #endregion
       

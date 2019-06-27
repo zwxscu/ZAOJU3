@@ -3,14 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using ReaderB;
+using DevInterface;
 namespace DevAccess
 {
-    public class SgUrb3RW
+    public class SgUrb3RW:IrfidRW
     {
         #region 私有
         private byte readerID = 0;
         private string ipStr = "192.168.1.200";
         private uint netPort = 6000;
+        private bool isOpened = false;
         private static byte comAddr = 0xff;
         private static int portHandle = 0;
         private const int INVEPC_BUFMAX = 256;
@@ -19,7 +21,7 @@ namespace DevAccess
         private object rwLock = new object();
         #endregion
         #region 公有
-        bool IsOpened { get; set; }
+        public bool IsOpened { get { return isOpened; } }
         public byte ReaderID { get; set; }
         public SgUrb3RW(byte readerID, string ip, uint port)
         {
@@ -45,10 +47,12 @@ namespace DevAccess
             }
             if (re == 0x00)
             {
+                isOpened = true;
                 return true;
             }
             else
             {
+                isOpened = false;
                 return false;
             }
             
@@ -63,6 +67,7 @@ namespace DevAccess
             int re= StaticClassReaderB.CloseNetPort(portHandle);
             if (re == 0x00)
             {
+                isOpened = false;
                 return true;
             }
             else
@@ -220,6 +225,15 @@ namespace DevAccess
                 tidStr = sTID;
             }
             return tidStr;*/
+        }
+        public string ReadStrData()
+        {
+            byte[] bytesData = ReadBytesData();
+            if (bytesData == null)
+            {
+                return null;
+            }
+            return System.Text.Encoding.UTF8.GetString(bytesData);
         }
         #endregion
         private byte[] Inventory_EPC()

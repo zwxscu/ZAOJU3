@@ -3,7 +3,7 @@
   <sysSet>
     <RunMode sim="true" mesTestMode="false">仿真运行模式</RunMode>
     <Printer Enable="True">是否启动自动贴标</Printer>
-    <Mes Enable="True" OfflineMode="False">是否启动MES判断</Mes>
+    <Mes Enable="True" OfflineMode="True">是否启动MES判断</Mes>
     <!--MES下线查询最长时间-->
     <MesDownTimeout>20</MesDownTimeout>
     <!--RFID失败判断，最长允许时间-->

@@ -10,13 +10,24 @@ namespace DevAccess
         private int readerID = 1;
         public string Barcode = "EA1233";
         public int ReaderID { get { return readerID; } }
+        public string Role { get; set; }
+        public List<string> RecvBarcodesBuf { get; set; }
         public BarcodeRWSim(int id)
         {
             this.readerID = id;
+            Role = "";
+        }
+        public void ClearBarcodesBuf()
+        {
+            this.RecvBarcodesBuf.Clear();
         }
         public bool StartMonitor(ref  string reStr)
         {
             return true;
+        } 
+        public List<string> GetBarcodesBuf()
+        {
+            return RecvBarcodesBuf;
         }
         public bool StopMonitor()
         {

@@ -17,6 +17,11 @@ namespace DevAccess
         Qn,
         FX3UENET
     }
+    public enum EnumNetProto
+    {
+        TCP,
+        UDP
+    }
     /// <summary>
     /// 重新实现三菱PLC mc协议的接口类，基于TCP
     /// </summary>
@@ -26,6 +31,8 @@ namespace DevAccess
         EnumPlcCata plcCata = EnumPlcCata.Qn;
         private bool isConnected = false;
         private TcpClient tcpClient = null;
+        private UdpClient udpClient = null;
+        private IPEndPoint udpRemotePoint = null;
         private NetworkStream workStream = null;
         private ManualResetEvent connectDone = new ManualResetEvent(false);
        // private AutoResetEvent recvAutoEvent = new AutoResetEvent(false);
@@ -50,18 +57,21 @@ namespace DevAccess
         private byte writeTypeCode = 0xA8;              // 批量写软元件代码
         private byte readTypeCode = 0xA8;               // 批量读软元件代码
 
-        private const int recvTimeOut = 3000;          //发送出去之后，等待接收完毕，之间的最大时间间隔
+        private const int recvTimeOut = 2000;          //发送出去之后，等待接收完毕，之间的最大时间间隔
         private const int connTimeOut = 5;  //连接超时，单位：秒
         private EnumRequireType enumRequireType = EnumRequireType.成批读取;//默认值
         private object lockObj = new object();// 多线程锁
         private string connStr = "";
         private int netFailTimes = 0;//读取或写入次数超过5次自动重新连接，解决断网或者拔网线无法通讯问题
-
+        private EnumNetProto netProto = EnumNetProto.TCP;
         private bool exitConnMonitor = false;
+       // private bool exitUdpRecv = false;
         private Thread connMonitorThread = null;
+        //private Thread udpRecvThread = null;
+        //private bool pauseUdpRecv = true;
         public string ConnStr
         { get { return connStr; } set { this.connStr = value; } }
-
+        private object rwLock = new object();
         private Int64 plcStatCounter = 0;
         private int db1Len = 1000;
         private int db2Len = 1000;
@@ -74,7 +84,8 @@ namespace DevAccess
         public Int64 PlcStatCounter { get { return plcStatCounter; } }
 
         public EnumPlcCata PlcCata { get { return plcCata; } set { plcCata = value; } }
-        
+
+        public EnumNetProto NetProto { get { return netProto; } set { netProto = value; } }
         #endregion
 
         #region 初始化
@@ -102,6 +113,7 @@ namespace DevAccess
             }
             db1Vals = new Int16[this.db1Len];
             db2Vals = new Int16[this.db2Len];
+            
         }
         public void Init()
         {
@@ -123,6 +135,7 @@ namespace DevAccess
         #endregion
 
         #region  接口实现
+        public string PlcRole { get; set; }
         public int StationNumber { get; set; }
         /// <summary>
         /// 作者:np
@@ -171,88 +184,18 @@ namespace DevAccess
             }
 
         }
-
-        /// <summary>
-        /// 作者:np
-        /// 时间:2014年6月2日
-        /// 内容:连接服务器
-        /// </summary>
-        /// <param name="plcAddr"></param>
-        /// <param name="reStr"></param>
-        /// <returns></returns>
         public bool ConnectPLC(ref string reStr)
         {
-            try
+            if(netProto == EnumNetProto.TCP)
             {
-                if(string.IsNullOrEmpty(this.connStr))
-                {
-                    reStr = "PLC通信地址为空!";
-                    return false;
-                }
-                //this.connStr = plcAddr;
-                string[] splitStr = new string[] { ",", ";", ":", "-", "|" };
-                string[] strArray = this.connStr.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
-                if (strArray.Count() < 2)
-                {
-                    isConnected = false;
-                }
-                if ((tcpClient == null) || (!this.isConnected))
-                {
-                    //try
-                    //{
-                    if (this.tcpClient != null)//如果不为空先关闭
-                    {
-                        this.tcpClient.Close();
-                    }
-                    tcpClient = new TcpClient();
-                    
-                    tcpClient.ReceiveTimeout = connTimeOut;
-                    connectDone.Reset();
-                    tcpClient.BeginConnect(strArray[0], int.Parse(strArray[1]), new AsyncCallback(ConnectCallback), tcpClient);
-                    connectDone.WaitOne();
-                    if ((tcpClient != null) && (this.isConnected))
-                    {
-                        workStream = tcpClient.GetStream();
-                        StateObject state = new StateObject();
-                        state.client = tcpClient;
-                        if (workStream.CanRead)
-                        {
-                            IAsyncResult ar = workStream.BeginRead(state.buffer, 0, StateObject.BufferSize,
-                                    new AsyncCallback(TCPReadCallBack), state);
-                        }
-
-                        isConnected = true;
-                        this.netFailTimes = 0;
-                    }
-                    else
-                    {
-                        isConnected = false;
-                    }
-                    //}
-                    //catch (Exception se)
-                    //{
-                    //    isConnected = false;
-                    //    reStr = "Q PLC连接失败";
-                    //    return false;
-                    //}
-                }
+                return ConnectPLCTcp(ref reStr);
             }
-            catch
+            else
             {
-                isConnected = false;
-                reStr = "Q PLC连接失败";
+                return ConnectPLCUdp(ref reStr);
             }
-            if (isConnected)
-            {
-                reStr = "连接PLC成功！";
-                this.netFailTimes = 0; //读写失败次数清零
-                
-            }
-            else {
-                reStr = "连接PLC失败!";
-            }
-            return isConnected;
         }
+       
 
         /// <summary>
         /// 作者:np
@@ -348,16 +291,16 @@ namespace DevAccess
             {
                 lock (lockObj)
                 {
-                    if(!isConnected)
-                    {
-                        return false;
-                    }
-                    //if (this.netFailTimes > 2 || (!isConnected))//超过2次就触发断开事件
+                    //if(!isConnected)
                     //{
-                    //    isConnected = false;
-                       
                     //    return false;
                     //}
+                    if (this.netFailTimes > 2 )//超过2次就触发断开事件
+                    {
+                        isConnected = false;
+
+                        return false;
+                    }
                    
                     List<byte> sendBuffer = new List<byte>();//发送缓存
                     
@@ -407,7 +350,12 @@ namespace DevAccess
                             break;
                     }
 
-                    SendData(sendBuffer.ToArray());
+                    if(!SendData(sendBuffer.ToArray()))
+                    {
+                        this.netFailTimes++;
+
+                        return false;
+                    }
                     enumRequireType = EnumRequireType.成批读取;
                    // if (recvAutoEvent.WaitOne(recvTimeOut, false))
                     if (WaitRecvOK(recvTimeOut))
@@ -457,17 +405,17 @@ namespace DevAccess
             {
                 lock (lockObj)
                 {
-                    if (!isConnected)
-                    {
-                        return false;
-                    }
-                    //if (this.netFailTimes > 2 || (!isConnected))//超过2次就触发断开事件
+                    //if (!isConnected)
                     //{
-                    //    isConnected = false;
-                    //   // OnLinkLost();
-                        
                     //    return false;
                     //}
+                    if (this.netFailTimes > 2 )//超过2次就触发断开事件
+                    {
+                        isConnected = false;
+                        // OnLinkLost();
+
+                        return false;
+                    }
                     List<byte> sendBuffer = new List<byte>();//发送缓存
                     switch (plcCata)
                     {
@@ -524,9 +472,13 @@ namespace DevAccess
                         default:
                             break;
                     }
-                    
 
-                    SendData(sendBuffer.ToArray());
+                    if (!SendData(sendBuffer.ToArray()))
+                    {
+                        this.netFailTimes++;
+
+                        return false;
+                    }
                     enumRequireType = EnumRequireType.成批写入;
                    // if (recvAutoEvent.WaitOne(recvTimeOut, false))
                     if (WaitRecvOK(recvTimeOut))
@@ -564,6 +516,42 @@ namespace DevAccess
             if (this.plcStatCounter > long.MaxValue - 10)
             {
                 this.plcStatCounter = 1;
+            }
+        }
+        public void GetDB2Data(int addrSt, int blockNum, ref short[] buf)
+        {
+            lock (rwLock)
+            {
+                for (int i = 0; i < blockNum; i++)
+                {
+                    buf[i] = db2Vals[addrSt + i];
+
+                }
+            }
+        }
+        public void SetDB1Data(int addrSt, int blockNum, short[] buf)
+        {
+            lock (rwLock)
+            {
+                for (int i = 0; i < blockNum; i++)
+                {
+                    db1Vals[addrSt + i] = buf[i];
+
+                }
+            }
+        }
+        public void DB2Switch(short[] tempBuf)
+        {
+            lock (rwLock)
+            {
+                Array.Copy(tempBuf, db2Vals, tempBuf.Count());
+            }
+        }
+        public void DB1Switch(ref short[] tempBuf)
+        {
+            lock (rwLock)
+            {
+                Array.Copy(db1Vals, tempBuf, tempBuf.Count());
             }
         }
         #endregion
@@ -607,9 +595,10 @@ namespace DevAccess
         private void ConnectCallback(IAsyncResult ar)
         {
             
-            TcpClient tc = (TcpClient)ar.AsyncState;
+           
             try
             {
+                TcpClient tc = (TcpClient)ar.AsyncState;
                 if (tc.Connected)
                 {
                     this.isConnected = true;
@@ -751,25 +740,42 @@ namespace DevAccess
         {
             try
             {
-                if (workStream != null)
+                if(netProto == EnumNetProto.TCP)
                 {
-                    this.recBuffer.Clear();//发送请求之前清缓存
-                    workStream.Write(sendData, 0, sendData.Length);
-                    return true;
+                    if (workStream != null)
+                    {
+                        this.recBuffer.Clear();//发送请求之前清缓存
+                       // IPEndPoint remoteIpep = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 8848); // 发送到的IP地址和端口号
+
+                        workStream.Write(sendData, 0, sendData.Length);
+                        
+                        return true;
+                    }
+                    else
+                    {
+                        //PlcReLinkArgs args = new PlcReLinkArgs();
+                        //args.PlcID = this.PlcID;
+                        //args.StrConn = this.connStr;
+
+                        //if (eventLinkLost != null)//连接断开
+                        //{
+                        //    eventLinkLost.Invoke(this, args);
+                        //}
+                        this.isConnected = false;
+                        return false;
+                    }
                 }
                 else
                 {
-                    //PlcReLinkArgs args = new PlcReLinkArgs();
-                    //args.PlcID = this.PlcID;
-                    //args.StrConn = this.connStr;
-          
-                    //if (eventLinkLost != null)//连接断开
-                    //{
-                    //    eventLinkLost.Invoke(this, args);
-                    //}
-                    this.isConnected = false;
+                    this.recBuffer.Clear();//发送请求之前清缓存
+                    int re = this.udpClient.Send(sendData, sendData.Count(),this.udpRemotePoint);
+                    if(re >0)
+                    {
+                        return true;
+                    }
                     return false;
                 }
+                
             }
             catch
             {
@@ -813,8 +819,9 @@ namespace DevAccess
                 {
                     byte[] recBytes = new byte[numberOfBytesRead];
                     Array.Copy(state.buffer, 0, recBytes, 0, numberOfBytesRead);
-                    netStream.BeginRead(state.buffer, 0, StateObject.BufferSize, new AsyncCallback(TCPReadCallBack), state);
                     this.recBuffer.AddRange(recBytes);
+                    netStream.BeginRead(state.buffer, 0, StateObject.BufferSize, new AsyncCallback(TCPReadCallBack), state);
+                    
                     //if (IsReceiveComplete())
                     //{
                     //    recvAutoEvent.Set();
@@ -888,10 +895,10 @@ namespace DevAccess
                             {
                                 if(this.recBuffer[1] !=0)
                                 {
-                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("H");
+                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("X2");
                                     if(this.recBuffer[2] !=0)
                                     {
-                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("H");
+                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("X2");
                                     }
                                     break;
                                 }
@@ -937,10 +944,10 @@ namespace DevAccess
                             {
                                 if (this.recBuffer[1] != 0)
                                 {
-                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("H");
+                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("X2");
                                     if (this.recBuffer[2] != 0)
                                     {
-                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("H");
+                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("X2");
                                     }
                                     break;
                                 }
@@ -969,17 +976,6 @@ namespace DevAccess
         private int RecvCheck()
         {
             int re = 1;
-            //if (plcCata == EnumPlcCata.FX3UENET)
-            //{
-            //    Console.WriteLine("接收到数据长度:" + this.recBuffer.Count.ToString());
-            //    if(this.recBuffer.Count>0)
-            //    {
-            //       for(int i=0;i<this.recBuffer.Count;i++)
-            //       {
-            //           Console.Write(this.recBuffer[i].ToString() + ",");
-            //       }
-            //    }
-            //}
             if (enumRequireType == EnumRequireType.成批读取)
             {
                 switch (plcCata)
@@ -992,12 +988,13 @@ namespace DevAccess
                                 if (recBuffer[9] != 0x00 || recBuffer[10] != 0x00)
                                 {
                                     re = 2;
-                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[9].ToString("H");
+                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[9].ToString("X2");
                                     if (this.recBuffer[10] != 0)
                                     {
-                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[10].ToString("H");
+                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[10].ToString("X2");
                                        
                                     }
+                                    Console.WriteLine("{0}{1}", connStr, lastErrorInfo);
                                 }
                                 else if (recBuffer[0] == 208 && recBuffer[1] == 0x00)//判断头尾是否正确
                                 {
@@ -1013,7 +1010,7 @@ namespace DevAccess
                                         else
                                         {
                                             re = 1;
-                                            Console.WriteLine("PLC返回数据长度错误，应该返回{0},实际返回{1}", recvLenRequire, this.recBuffer.Count);
+                                            Console.WriteLine("{0},PLC返回数据长度错误，应该返回{1},实际返回{2}", this.connStr,recvLenRequire, this.recBuffer.Count);
                                         }
                                     }
                                     else
@@ -1036,10 +1033,10 @@ namespace DevAccess
                             {
                                 if (this.recBuffer[1] != 0)
                                 {
-                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("H");
+                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("X2");
                                     if (this.recBuffer[2] != 0)
                                     {
-                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("H");
+                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("X2");
                                         re = 2;
                                     }
                                     break;
@@ -1090,10 +1087,10 @@ namespace DevAccess
                             {
                                 if (this.recBuffer[1] != 0)
                                 {
-                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("H");
+                                    lastErrorInfo = "接收错误，结束码：0x" + this.recBuffer[1].ToString("X2");
                                     if (this.recBuffer[2] != 0)
                                     {
-                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("H");
+                                        lastErrorInfo += "，异常码：0x" + this.recBuffer[2].ToString("X2");
                                         re = 2;
                                     }
                                     break;
@@ -1118,7 +1115,7 @@ namespace DevAccess
                 }
 
             }
-            
+           
             return re;
         }
         private bool WaitRecvOK(int timeOut)
@@ -1153,6 +1150,168 @@ namespace DevAccess
                 }
             }
         }
+        /// <summary>
+        /// 作者:np
+        /// 时间:2014年6月2日
+        /// 内容:连接服务器
+        /// </summary>
+        /// <param name="plcAddr"></param>
+        /// <param name="reStr"></param>
+        /// <returns></returns>
+        private bool ConnectPLCTcp(ref string reStr)
+        {
+            try
+            {
+                lock (lockObj)
+                {
+                    if (string.IsNullOrEmpty(this.connStr))
+                    {
+                        reStr = "PLC通信地址为空!";
+                        return false;
+                    }
+                    //this.connStr = plcAddr;
+                    string[] splitStr = new string[] { ",", ";", ":", "-", "|" };
+                    string[] strArray = this.connStr.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
+                    if (strArray.Count() < 2)
+                    {
+                        isConnected = false;
+                    }
+                    if ((tcpClient == null) || (!this.isConnected))
+                    {
+                        //try
+                        //{
+                        if (this.tcpClient != null)//如果不为空先关闭
+                        {
+                            this.tcpClient.Close();
+                        }
+                        tcpClient = new TcpClient();
+
+                        tcpClient.ReceiveTimeout = connTimeOut;
+                        connectDone.Reset();
+                        tcpClient.BeginConnect(strArray[0], int.Parse(strArray[1]), new AsyncCallback(ConnectCallback), tcpClient);
+
+                        connectDone.WaitOne();
+                        if ((tcpClient != null) && (this.isConnected))
+                        {
+                            workStream = tcpClient.GetStream();
+                            StateObject state = new StateObject();
+                            state.client = tcpClient;
+                            if (workStream.CanRead)
+                            {
+                                IAsyncResult ar = workStream.BeginRead(state.buffer, 0, StateObject.BufferSize,
+                                        new AsyncCallback(TCPReadCallBack), state);
+                            }
+                           
+                            isConnected = true;
+                            this.netFailTimes = 0;
+                        }
+                        else
+                        {
+                            isConnected = false;
+                        }
+                    }
+                    if (isConnected)
+                    {
+                        reStr = "连接PLC成功！";
+                        this.netFailTimes = 0; //读写失败次数清零
+
+                    }
+                    else
+                    {
+                        reStr = "连接PLC失败!";
+                    }
+                    return isConnected;
+                }
+
+            }
+            catch
+            {
+                isConnected = false;
+                reStr = "Q PLC连接失败";
+                return false;
+            }
+
+
+        }
+        private bool ConnectPLCUdp(ref string reStr)
+        {
+            try
+            {
+                 lock (lockObj)
+                 {
+                     if (string.IsNullOrEmpty(this.connStr))
+                     {
+                         reStr = "PLC通信地址为空!";
+                         return false;
+                     }
+                     //this.connStr = plcAddr;
+                     string[] splitStr = new string[] { ",", ";", ":", "-", "|" };
+                     string[] strArray = this.connStr.Split(splitStr, StringSplitOptions.RemoveEmptyEntries);
+                     if (strArray.Count() < 2)
+                     {
+                         isConnected = false;
+                     }
+                     string remoteIP = strArray[0];
+                     int remotePort = int.Parse(strArray[1]);
+                     if(udpClient == null)
+                     {
+                         udpClient = new UdpClient(9898);
+                     }
+                     this.udpRemotePoint = new IPEndPoint(IPAddress.Parse(remoteIP), remotePort);
+
+                     UdpState udpReceiveState = new UdpState();
+                     udpReceiveState.ipEndPoint = this.udpRemotePoint;
+                     udpReceiveState.udpClient = udpClient;
+
+                     udpClient.BeginReceive(UdpRecvCallback, udpReceiveState);
+                     //if(udpRecvThread == null)
+                     //{
+                     //    udpRecvThread = new Thread(UdpRecvProc);
+                     //    udpRecvThread.IsBackground = true;
+                     //    exitUdpRecv = false;
+                         
+                     //}
+                     //if (this.udpRecvThread.ThreadState == (ThreadState.Background | ThreadState.Unstarted))
+                     //{
+                     //    udpRecvThread.Start();
+                     //}
+                     //pauseUdpRecv = false;
+                     reStr = "PLC连接成功";
+                     isConnected = true;
+                     this.netFailTimes = 0; //读写失败次数清零
+                     return true;
+                 }
+            }
+            catch (Exception ex)
+            {
+                reStr = ex.ToString();
+                return false;
+                
+            }
+        }
+        private void UdpRecvCallback(IAsyncResult iar)
+        {
+            UdpState udpState = iar.AsyncState as UdpState;
+            if (iar.IsCompleted)
+            {
+                Byte[] recBytes = udpState.udpClient.EndReceive(iar, ref udpState.ipEndPoint);
+                if(recBytes != null && recBytes.Count()>0)
+                {
+                     this.recBuffer.AddRange(recBytes);
+                     //Console.Write("Recv:");
+                     //for(int i=0;i<recBytes.Count();i++)
+                     //{
+                     //    Console.Write("{0}", recBytes[i].ToString("X2"));
+                     //}
+                     //Console.WriteLine("");
+
+                }
+               
+            }
+            udpClient.BeginReceive(UdpRecvCallback, udpState);
+
+        }
+
         #endregion
     }
 
@@ -1169,6 +1328,15 @@ namespace DevAccess
         public string readType = null;
         public byte[] buffer = new byte[BufferSize];
         public StringBuilder messageBuffer = new StringBuilder();
+    }
+    // 定义 UdpState类
+    internal class UdpState
+    {
+        public UdpClient udpClient;
+        public IPEndPoint ipEndPoint;
+        //public const int BufferSize = 1024;
+        //public byte[] buffer = new byte[BufferSize];
+        //public int counter = 0;
     }
 
    

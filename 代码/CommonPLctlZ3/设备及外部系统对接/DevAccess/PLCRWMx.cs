@@ -19,8 +19,14 @@ namespace DevAccess
         private delegate bool DelegateReadMultiDB(string addr, int blockNum, ref short[] vals);
         private delegate bool DelegateWriteDB(string addr, int val);
         private delegate bool DelegateWriteMultiDB(string addr, int blockNum, short[] vals);
-        public static Int16[] db1Vals = new Int16[1000];
-        public static Int16[] db2Vals = new Int16[1000];
+        private int db1Len = 1000;
+        private int db2Len = 1000;
+        private Int16[] db1Vals = null;
+        private Int16[] db2Vals = null;
+        public Int16[] Db1Vals { get { return db1Vals; } set { db1Vals = value; } }
+        public Int16[] Db2Vals { get { return db2Vals; } set { db2Vals = value; } }
+        public Int64 PlcStatCounter { get { return plcStatCounter; } }
+        public string PlcRole { get; set; }
         #region 数据区
         
        // private ActQNUDECPUTCP _actObj;
@@ -34,7 +40,7 @@ namespace DevAccess
         public string ConnStr
         { get { return connStr; } set { this.connStr = value; } }
         public System.Windows.Forms.Control hostControl { get; set; }
-        public Int64 PlcStatCounter { get { return plcStatCounter; } }
+     //   public Int64 PlcStatCounter { get { return plcStatCounter; } }
         private object rwLock = new object();
         #endregion 
 
@@ -58,7 +64,16 @@ namespace DevAccess
 
             //_actObj.ActNetworkNumber = 0;
            // _actObj.ActStationNumber = 0;
- 
+            if (this.db1Len < 10)
+            {
+                this.db1Len = 10;
+            }
+            if (this.db2Len < 10)
+            {
+                this.db2Len = 10;
+            }
+            db1Vals = new Int16[this.db1Len];
+            db2Vals = new Int16[this.db2Len];
         }
         #region  接口实现
         public int PlcID { get; set; }
@@ -263,38 +278,38 @@ namespace DevAccess
         }
         public void GetDB2Data(int addrSt,int blockNum,ref short[] buf)
         {
-           // lock(rwLock)
+            lock(rwLock)
             {
                 for (int i = 0; i < blockNum; i++)
                 {
-                    buf[i] = PLCRWMx.db2Vals[addrSt + i];
+                    buf[i] = db2Vals[addrSt + i];
                    
                 }
             }
         }
         public void SetDB1Data(int addrSt,int blockNum,short[] buf)
         {
-          //  lock(rwLock)
+            lock(rwLock)
             {
                  for (int i = 0; i < blockNum; i++)
                  {
-                     PLCRWMx.db1Vals[addrSt + i] = buf[i];
+                     db1Vals[addrSt + i] = buf[i];
 
                  }
             }
         }
         public void DB2Switch(short[] tempBuf)
         {
-            //lock(rwLock)
+            lock(rwLock)
             {
-                Array.Copy(tempBuf, PLCRWMx.db2Vals, tempBuf.Count());
+                Array.Copy(tempBuf, db2Vals, tempBuf.Count());
             }
         }
         public void DB1Switch(ref short[] tempBuf)
         {
-          //  lock(rwLock)
+            lock(rwLock)
             {
-                Array.Copy(PLCRWMx.db1Vals, tempBuf, tempBuf.Count());
+                Array.Copy(db1Vals, tempBuf, tempBuf.Count());
             }
         }
         #endregion

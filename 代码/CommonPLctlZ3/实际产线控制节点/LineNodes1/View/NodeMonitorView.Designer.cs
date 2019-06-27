@@ -129,7 +129,7 @@
             this.tabControl1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tabControl1.ItemSize = new System.Drawing.Size(84, 26);
             this.tabControl1.Location = new System.Drawing.Point(0, 0);
-            this.tabControl1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabControl1.Margin = new System.Windows.Forms.Padding(4);
             this.tabControl1.Name = "tabControl1";
             this.tabControl1.SelectedIndex = 0;
             this.tabControl1.Size = new System.Drawing.Size(1450, 716);
@@ -156,7 +156,7 @@
             this.tableLayoutMonitor.Controls.Add(this.panel1, 0, 1);
             this.tableLayoutMonitor.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutMonitor.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutMonitor.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutMonitor.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutMonitor.Name = "tableLayoutMonitor";
             this.tableLayoutMonitor.RowCount = 4;
             this.tableLayoutMonitor.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 42F));
@@ -177,7 +177,7 @@
             this.panel3.Controls.Add(this.label3);
             this.panel3.Controls.Add(this.label1);
             this.panel3.Location = new System.Drawing.Point(4, 517);
-            this.panel3.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel3.Margin = new System.Windows.Forms.Padding(4);
             this.panel3.Name = "panel3";
             this.panel3.Size = new System.Drawing.Size(1434, 161);
             this.panel3.TabIndex = 3;
@@ -254,7 +254,7 @@
             // 
             this.pictureBox1.BackColor = System.Drawing.Color.Red;
             this.pictureBox1.Location = new System.Drawing.Point(4, 4);
-            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.pictureBox1.Margin = new System.Windows.Forms.Padding(4);
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.Size = new System.Drawing.Size(44, 20);
             this.pictureBox1.TabIndex = 0;
@@ -365,7 +365,7 @@
             this.flowLayoutPanel1.BackColor = System.Drawing.SystemColors.GradientInactiveCaption;
             this.flowLayoutPanel1.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.flowLayoutPanel1.Location = new System.Drawing.Point(4, 150);
-            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.flowLayoutPanel1.Margin = new System.Windows.Forms.Padding(4);
             this.flowLayoutPanel1.Name = "flowLayoutPanel1";
             this.flowLayoutPanel1.Size = new System.Drawing.Size(1434, 357);
             this.flowLayoutPanel1.TabIndex = 2;
@@ -380,7 +380,7 @@
             this.panel1.Controls.Add(this.label12);
             this.panel1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.panel1.Location = new System.Drawing.Point(4, 46);
-            this.panel1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.panel1.Margin = new System.Windows.Forms.Padding(4);
             this.panel1.Name = "panel1";
             this.panel1.Size = new System.Drawing.Size(1434, 96);
             this.panel1.TabIndex = 0;
@@ -409,7 +409,7 @@
             this.flowLayoutPanel2.Controls.Add(this.bt_ExitSys);
             this.flowLayoutPanel2.Controls.Add(this.btnDevCheck);
             this.flowLayoutPanel2.Location = new System.Drawing.Point(-6, 6);
-            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.flowLayoutPanel2.Margin = new System.Windows.Forms.Padding(4);
             this.flowLayoutPanel2.Name = "flowLayoutPanel2";
             this.flowLayoutPanel2.Size = new System.Drawing.Size(804, 89);
             this.flowLayoutPanel2.TabIndex = 8;
@@ -422,7 +422,7 @@
             this.bt_StartSystem.Image = ((System.Drawing.Image)(resources.GetObject("bt_StartSystem.Image")));
             this.bt_StartSystem.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.bt_StartSystem.Location = new System.Drawing.Point(4, 4);
-            this.bt_StartSystem.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.bt_StartSystem.Margin = new System.Windows.Forms.Padding(4);
             this.bt_StartSystem.Name = "bt_StartSystem";
             this.bt_StartSystem.Size = new System.Drawing.Size(192, 75);
             this.bt_StartSystem.TabIndex = 38;
@@ -439,7 +439,7 @@
             this.bt_StopSystem.Image = ((System.Drawing.Image)(resources.GetObject("bt_StopSystem.Image")));
             this.bt_StopSystem.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.bt_StopSystem.Location = new System.Drawing.Point(204, 4);
-            this.bt_StopSystem.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.bt_StopSystem.Margin = new System.Windows.Forms.Padding(4);
             this.bt_StopSystem.Name = "bt_StopSystem";
             this.bt_StopSystem.Size = new System.Drawing.Size(200, 74);
             this.bt_StopSystem.TabIndex = 39;
@@ -456,7 +456,7 @@
             this.bt_ExitSys.Image = ((System.Drawing.Image)(resources.GetObject("bt_ExitSys.Image")));
             this.bt_ExitSys.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.bt_ExitSys.Location = new System.Drawing.Point(412, 4);
-            this.bt_ExitSys.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.bt_ExitSys.Margin = new System.Windows.Forms.Padding(4);
             this.bt_ExitSys.Name = "bt_ExitSys";
             this.bt_ExitSys.Size = new System.Drawing.Size(172, 74);
             this.bt_ExitSys.TabIndex = 40;
@@ -473,7 +473,7 @@
             this.btnDevCheck.Image = ((System.Drawing.Image)(resources.GetObject("btnDevCheck.Image")));
             this.btnDevCheck.ImageAlign = System.Drawing.ContentAlignment.MiddleLeft;
             this.btnDevCheck.Location = new System.Drawing.Point(592, 4);
-            this.btnDevCheck.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.btnDevCheck.Margin = new System.Windows.Forms.Padding(4);
             this.btnDevCheck.Name = "btnDevCheck";
             this.btnDevCheck.Size = new System.Drawing.Size(172, 74);
             this.btnDevCheck.TabIndex = 40;
@@ -516,9 +516,9 @@
             this.tabPage2.BackColor = System.Drawing.SystemColors.ActiveCaption;
             this.tabPage2.Controls.Add(this.splitContainer1);
             this.tabPage2.Location = new System.Drawing.Point(4, 30);
-            this.tabPage2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Margin = new System.Windows.Forms.Padding(4);
             this.tabPage2.Name = "tabPage2";
-            this.tabPage2.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tabPage2.Padding = new System.Windows.Forms.Padding(4);
             this.tabPage2.Size = new System.Drawing.Size(1442, 682);
             this.tabPage2.TabIndex = 1;
             this.tabPage2.Text = "数据通信监控";
@@ -527,7 +527,7 @@
             // 
             this.splitContainer1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.splitContainer1.Location = new System.Drawing.Point(4, 4);
-            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.splitContainer1.Margin = new System.Windows.Forms.Padding(4);
             this.splitContainer1.Name = "splitContainer1";
             // 
             // splitContainer1.Panel1
@@ -553,7 +553,7 @@
             // 
             this.checkBoxAutorefresh.AutoSize = true;
             this.checkBoxAutorefresh.Location = new System.Drawing.Point(14, 80);
-            this.checkBoxAutorefresh.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.checkBoxAutorefresh.Margin = new System.Windows.Forms.Padding(4);
             this.checkBoxAutorefresh.Name = "checkBoxAutorefresh";
             this.checkBoxAutorefresh.Size = new System.Drawing.Size(106, 22);
             this.checkBoxAutorefresh.TabIndex = 9;
@@ -583,9 +583,9 @@
             this.groupBoxCtlSim.Controls.Add(this.label7);
             this.groupBoxCtlSim.Controls.Add(this.label25);
             this.groupBoxCtlSim.Location = new System.Drawing.Point(10, 164);
-            this.groupBoxCtlSim.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxCtlSim.Margin = new System.Windows.Forms.Padding(4);
             this.groupBoxCtlSim.Name = "groupBoxCtlSim";
-            this.groupBoxCtlSim.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBoxCtlSim.Padding = new System.Windows.Forms.Padding(4);
             this.groupBoxCtlSim.Size = new System.Drawing.Size(442, 430);
             this.groupBoxCtlSim.TabIndex = 8;
             this.groupBoxCtlSim.TabStop = false;
@@ -598,7 +598,7 @@
             "OK",
             "NG"});
             this.comboBoxAirlossRe.Location = new System.Drawing.Point(135, 160);
-            this.comboBoxAirlossRe.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxAirlossRe.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxAirlossRe.Name = "comboBoxAirlossRe";
             this.comboBoxAirlossRe.Size = new System.Drawing.Size(138, 26);
             this.comboBoxAirlossRe.TabIndex = 14;
@@ -609,7 +609,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxBarcodeGun.FormattingEnabled = true;
             this.comboBoxBarcodeGun.Location = new System.Drawing.Point(135, 291);
-            this.comboBoxBarcodeGun.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxBarcodeGun.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxBarcodeGun.Name = "comboBoxBarcodeGun";
             this.comboBoxBarcodeGun.Size = new System.Drawing.Size(196, 26);
             this.comboBoxBarcodeGun.TabIndex = 12;
@@ -629,7 +629,7 @@
             this.textBoxBarcode.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxBarcode.Location = new System.Drawing.Point(90, 330);
-            this.textBoxBarcode.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxBarcode.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxBarcode.Name = "textBoxBarcode";
             this.textBoxBarcode.Size = new System.Drawing.Size(247, 28);
             this.textBoxBarcode.TabIndex = 11;
@@ -650,7 +650,7 @@
             | System.Windows.Forms.AnchorStyles.Right)));
             this.comboBoxRfid.FormattingEnabled = true;
             this.comboBoxRfid.Location = new System.Drawing.Point(135, 200);
-            this.comboBoxRfid.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxRfid.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxRfid.Name = "comboBoxRfid";
             this.comboBoxRfid.Size = new System.Drawing.Size(196, 26);
             this.comboBoxRfid.TabIndex = 8;
@@ -679,7 +679,7 @@
             // buttonDB2Reset
             // 
             this.buttonDB2Reset.Location = new System.Drawing.Point(4, 111);
-            this.buttonDB2Reset.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonDB2Reset.Margin = new System.Windows.Forms.Padding(4);
             this.buttonDB2Reset.Name = "buttonDB2Reset";
             this.buttonDB2Reset.Size = new System.Drawing.Size(134, 36);
             this.buttonDB2Reset.TabIndex = 7;
@@ -690,7 +690,7 @@
             // 
             this.comboBoxDB2.FormattingEnabled = true;
             this.comboBoxDB2.Location = new System.Drawing.Point(126, 27);
-            this.comboBoxDB2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxDB2.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxDB2.Name = "comboBoxDB2";
             this.comboBoxDB2.Size = new System.Drawing.Size(145, 26);
             this.comboBoxDB2.TabIndex = 1;
@@ -700,7 +700,7 @@
             this.textBoxRfidVal.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxRfidVal.Location = new System.Drawing.Point(90, 238);
-            this.textBoxRfidVal.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxRfidVal.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxRfidVal.Name = "textBoxRfidVal";
             this.textBoxRfidVal.Size = new System.Drawing.Size(247, 28);
             this.textBoxRfidVal.TabIndex = 5;
@@ -708,7 +708,7 @@
             // textBoxDB2ItemVal
             // 
             this.textBoxDB2ItemVal.Location = new System.Drawing.Point(128, 74);
-            this.textBoxDB2ItemVal.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.textBoxDB2ItemVal.Margin = new System.Windows.Forms.Padding(4);
             this.textBoxDB2ItemVal.Name = "textBoxDB2ItemVal";
             this.textBoxDB2ItemVal.Size = new System.Drawing.Size(144, 28);
             this.textBoxDB2ItemVal.TabIndex = 5;
@@ -726,7 +726,7 @@
             // buttonRfidSimWrite
             // 
             this.buttonRfidSimWrite.Location = new System.Drawing.Point(3, 366);
-            this.buttonRfidSimWrite.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonRfidSimWrite.Margin = new System.Windows.Forms.Padding(4);
             this.buttonRfidSimWrite.Name = "buttonRfidSimWrite";
             this.buttonRfidSimWrite.Size = new System.Drawing.Size(264, 40);
             this.buttonRfidSimWrite.TabIndex = 0;
@@ -737,7 +737,7 @@
             // buttonDB2SimSet
             // 
             this.buttonDB2SimSet.Location = new System.Drawing.Point(147, 111);
-            this.buttonDB2SimSet.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonDB2SimSet.Margin = new System.Windows.Forms.Padding(4);
             this.buttonDB2SimSet.Name = "buttonDB2SimSet";
             this.buttonDB2SimSet.Size = new System.Drawing.Size(126, 36);
             this.buttonDB2SimSet.TabIndex = 0;
@@ -779,7 +779,7 @@
             // 
             this.comboBoxDevList.FormattingEnabled = true;
             this.comboBoxDevList.Location = new System.Drawing.Point(8, 40);
-            this.comboBoxDevList.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.comboBoxDevList.Margin = new System.Windows.Forms.Padding(4);
             this.comboBoxDevList.Name = "comboBoxDevList";
             this.comboBoxDevList.Size = new System.Drawing.Size(276, 26);
             this.comboBoxDevList.TabIndex = 5;
@@ -787,7 +787,7 @@
             // buttonClearDevCmd
             // 
             this.buttonClearDevCmd.Location = new System.Drawing.Point(150, 112);
-            this.buttonClearDevCmd.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonClearDevCmd.Margin = new System.Windows.Forms.Padding(4);
             this.buttonClearDevCmd.Name = "buttonClearDevCmd";
             this.buttonClearDevCmd.Size = new System.Drawing.Size(135, 40);
             this.buttonClearDevCmd.TabIndex = 3;
@@ -798,7 +798,7 @@
             // buttonRefreshDevStatus
             // 
             this.buttonRefreshDevStatus.Location = new System.Drawing.Point(10, 112);
-            this.buttonRefreshDevStatus.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.buttonRefreshDevStatus.Margin = new System.Windows.Forms.Padding(4);
             this.buttonRefreshDevStatus.Name = "buttonRefreshDevStatus";
             this.buttonRefreshDevStatus.Size = new System.Drawing.Size(130, 40);
             this.buttonRefreshDevStatus.TabIndex = 4;
@@ -819,7 +819,7 @@
             this.tableLayoutPanel2.Controls.Add(this.groupBox1, 0, 2);
             this.tableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.tableLayoutPanel2.Location = new System.Drawing.Point(0, 0);
-            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.tableLayoutPanel2.Margin = new System.Windows.Forms.Padding(4);
             this.tableLayoutPanel2.Name = "tableLayoutPanel2";
             this.tableLayoutPanel2.RowCount = 3;
             this.tableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Absolute, 34F));
@@ -842,7 +842,7 @@
             this.dataGridViewDevDB1.DefaultCellStyle = dataGridViewCellStyle1;
             this.dataGridViewDevDB1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewDevDB1.Location = new System.Drawing.Point(4, 38);
-            this.dataGridViewDevDB1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dataGridViewDevDB1.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridViewDevDB1.Name = "dataGridViewDevDB1";
             this.dataGridViewDevDB1.RowTemplate.Height = 23;
             this.dataGridViewDevDB1.Size = new System.Drawing.Size(498, 488);
@@ -853,7 +853,7 @@
             this.dataGridViewDevDB2.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridViewDevDB2.Dock = System.Windows.Forms.DockStyle.Fill;
             this.dataGridViewDevDB2.Location = new System.Drawing.Point(510, 38);
-            this.dataGridViewDevDB2.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.dataGridViewDevDB2.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridViewDevDB2.Name = "dataGridViewDevDB2";
             this.dataGridViewDevDB2.RowTemplate.Height = 23;
             this.dataGridViewDevDB2.Size = new System.Drawing.Size(498, 488);
@@ -891,9 +891,9 @@
             this.groupBox1.Controls.Add(this.richTextBoxTaskInfo);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(4, 534);
-            this.groupBox1.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Padding = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
             this.groupBox1.Size = new System.Drawing.Size(1004, 136);
             this.groupBox1.TabIndex = 7;
             this.groupBox1.TabStop = false;
@@ -904,7 +904,7 @@
             this.richTextBoxTaskInfo.Dock = System.Windows.Forms.DockStyle.Fill;
             this.richTextBoxTaskInfo.Font = new System.Drawing.Font("宋体", 14.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(134)));
             this.richTextBoxTaskInfo.Location = new System.Drawing.Point(4, 25);
-            this.richTextBoxTaskInfo.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.richTextBoxTaskInfo.Margin = new System.Windows.Forms.Padding(4);
             this.richTextBoxTaskInfo.Name = "richTextBoxTaskInfo";
             this.richTextBoxTaskInfo.Size = new System.Drawing.Size(996, 107);
             this.richTextBoxTaskInfo.TabIndex = 0;
@@ -917,7 +917,7 @@
             this.ClientSize = new System.Drawing.Size(1450, 716);
             this.Controls.Add(this.tabControl1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
-            this.Margin = new System.Windows.Forms.Padding(4, 4, 4, 4);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "NodeMonitorView";
             this.Text = "NodeMonitorView";
             this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.NodeMonitorView_FormClosed);

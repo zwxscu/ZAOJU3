@@ -30,7 +30,8 @@ namespace DevAccess
         private Thread recvThread;
         private bool recvExit = false;
         public int recvInterval = 10;
-        public Int64 PlcStatCounter { get { return 0; } }
+        private Int64 plcStatCounter = 0;
+       
         private const int recvMax = 1024;
         private const int recvTimeOut = 2000;//发送出去之后，等待接收完毕，之间的最大时间间隔
 
@@ -43,7 +44,10 @@ namespace DevAccess
         public EnumPlcCata plcCata = EnumPlcCata.FX3U;
         private int plcStationNumber = 1;
         private byte pcStationNumber = 0xff;
-       
+        private int db1Len = 1000;
+        private int db2Len = 1000;
+        private Int16[] db1Vals = null;
+        private Int16[] db2Vals = null;
         public SerialPort serialPort;
         private byte[] recvBuffer = new byte[recvMax];
         private int recvBytes = 0;
@@ -61,7 +65,12 @@ namespace DevAccess
         private const byte DLE = 0x10;
         private bool isConnect = false;
         private string comportName = "";
+        public string PlcRole { get; set; }
+        public Int64 PlcStatCounter { get { return 0; } }
         public string ComPort { get { return comportName; } set { comportName = value; } }
+        public Int16[] Db1Vals { get { return db1Vals; } set { db1Vals = value; } }
+        public Int16[] Db2Vals { get { return db2Vals; } set { db2Vals = value; } }
+     //   public Int64 PlcStatCounter { get { return plcStatCounter; } }
         public PlcRW485BD(EnumPlcCata plcEnum)
         {
             this.plcCata = plcEnum;
@@ -76,6 +85,16 @@ namespace DevAccess
             serialPort.BaudRate = 9600;
             //serialPort.WriteTimeout = 500;
             //serialPort.Handshake = Handshake.XOnXOff; //握手协议,软件XON/XOFF
+            if (this.db1Len < 10)
+            {
+                this.db1Len = 10;
+            }
+            if (this.db2Len < 10)
+            {
+                this.db2Len = 10;
+            }
+            db1Vals = new Int16[this.db1Len];
+            db2Vals = new Int16[this.db2Len];
         }
         #region 接口实现
 
@@ -204,6 +223,7 @@ namespace DevAccess
             
             try
             {
+               
                 if (serialPort.IsOpen)
                 {
 
@@ -245,18 +265,21 @@ namespace DevAccess
         {
             isConnect = false;
             recvExit = true;
+            Console.WriteLine(recvThread.ThreadState.ToString());
             Thread.Sleep(300);
-            if (recvThread != null && recvThread.ThreadState == (ThreadState.Running | ThreadState.Background))
-            {
-                if (!recvThread.Join(300))
-                {
-                    recvThread.Abort();
+            //if (recvThread != null && recvThread.ThreadState == (ThreadState.Running | ThreadState.Background))
+            //{
+            //   // Console.WriteLine("fx485 接收线程停止");
+            //    if (!recvThread.Join(300))
+            //    {
+            //        recvThread.Abort();
                    
-                }
-                recvThread = null;
-            }
+            //    }
+            //    recvThread = null;
+            //}
             if (serialPort.IsOpen)
             {
+                Console.WriteLine(serialPort.PortName + "串口关闭");
                 serialPort.Close();
             }
            
@@ -488,7 +511,6 @@ namespace DevAccess
                 return false;
             }*/
         }
-
         public bool ReadMultiDB(string addr, int blockNum, ref short[] vals)
         {
             if (string.IsNullOrWhiteSpace(addr) || addr.Length < 2)
@@ -1087,6 +1109,14 @@ namespace DevAccess
             }
             
         }
+        public void PlcRWStatUpdate()
+        {
+            this.plcStatCounter++;
+            if (this.plcStatCounter > long.MaxValue - 10)
+            {
+                this.plcStatCounter = 1;
+            }
+        }
         #endregion
 
         /// <summary>
@@ -1171,7 +1201,7 @@ namespace DevAccess
             while (!recvExit)
             {
                 Thread.Sleep(recvInterval);
-               // Console.WriteLine("begin recv:");
+           
                 if (!serialPort.IsOpen || (!isConnect))
                 {
                     continue;
@@ -1179,6 +1209,7 @@ namespace DevAccess
                 int recvLen = 0;
                 try
                 {
+                    //Console.WriteLine("begin recv:");
                     recvLen = serialPort.Read(buf, 0, 128);
                    
                     for (int i = 0; i < recvLen; i++)

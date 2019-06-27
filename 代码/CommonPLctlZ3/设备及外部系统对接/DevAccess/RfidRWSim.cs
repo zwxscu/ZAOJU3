@@ -18,6 +18,7 @@ namespace DevAccess
                 return isOpened;
             }
         }
+      
         /// <summary>
         /// 连接
         /// </summary>
@@ -69,6 +70,10 @@ namespace DevAccess
         public int ReadData()
         {
             return (int)simReadRfid;
+        }
+        public string ReadStrData()
+        {
+            return Uid;
         }
         public Int64 ReadDataInt64()
         {

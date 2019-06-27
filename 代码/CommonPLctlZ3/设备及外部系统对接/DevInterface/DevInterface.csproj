@@ -58,6 +58,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IAirlossDetectDev.cs" />
+    <Compile Include="IHKAccess.cs" />
+    <Compile Include="IOcvAccess.cs" />
     <Compile Include="PLCDataDef.cs" />
     <Compile Include="IBarcodeDev.cs" />
     <Compile Include="IMesAccess.cs" />

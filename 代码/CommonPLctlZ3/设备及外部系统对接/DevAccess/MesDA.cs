@@ -476,54 +476,46 @@ namespace DevAccess
     public class MesDA : IMesAccess
     {
         #region 数据
+
         protected string mesdbConnstr = "";
-        protected OracleConnection dbConn = null;
+        protected OracleConnection dbConn = new OracleConnection();
         MesWS.EventService ws = new MesWS.EventService();
+        public MesWS.EventService MesWS { get { return ws; } set { ws = value; } }
+        public string MesdbConnstr { get { return mesdbConnstr; } set { mesdbConnstr = value; } }
+        public bool SimMode { get; set; }
         #endregion
        
         public MesDA()
         {
-            int localSim = 0;
-            if(localSim==0)
-            {
-                mesdbConnstr = @"Data Source=(DESCRIPTION =
+            
+             mesdbConnstr = @"Data Source=(DESCRIPTION =
     (ADDRESS = (PROTOCOL = TCP)(HOST = 192.168.100.94)(PORT = 1521))
         (CONNECT_DATA =
           (SERVER = DEDICATED)
           (SERVICE_NAME = PRQMESDB)
         )
     );User Id=prqminda1;Password=prqminda1;Connection Timeout=5;";
-                dbConn = new OracleConnection();
-                
-            }
-            else
-            {
-                // 本地模拟MES db       
-                mesdbConnstr = @"Data Source=(DESCRIPTION =
-    (ADDRESS = (PROTOCOL = TCP)(HOST =127.0.0.1)(PORT = 1521))
-    (CONNECT_DATA =
-      (SERVER = DEDICATED)
-      (SERVICE_NAME = XE)
-    )
-  )
-;User Id=MYDB;Password=atscu;Connection Timeout=5;";
-            }
-
-            this.dbConn = new OracleConnection(this.mesdbConnstr);
+            
+            
         }
         #region 公共接口
-         public string MesdbConnstr
-        {
-            get { return mesdbConnstr; }
-            set { mesdbConnstr = value; }
-        }
+        
 
         public bool ConnDB(ref string reStr)
         {
             try 
 	        {
+
+                if(SimMode)
+                {
+                    return true;
+                }
                 this.dbConn.ConnectionString = this.mesdbConnstr;
-                this.dbConn.Open();
+                if (this.dbConn.State != ConnectionState.Open)
+                {
+                    this.dbConn.Open();
+                }
+                
                 reStr = "MES数据库连接OK";
                 return true;
 	        }
@@ -537,6 +529,10 @@ namespace DevAccess
         {
             try
             {
+                if (SimMode)
+                {
+                    return true;
+                }
                 this.dbConn.Close();
                 reStr = "数据库连接关闭";
                 return true;
@@ -625,6 +621,10 @@ namespace DevAccess
         }
         public bool MesBaseExist(string rcid)
         {
+            if (SimMode)
+            {
+                return true;
+            }
             StringBuilder strSql = new StringBuilder();
             strSql.Append("select count(1) from FT_MES_STEP_INFO");
             strSql.AppendFormat(" where RECID='{0}'",rcid);
@@ -636,6 +636,10 @@ namespace DevAccess
         }
         public bool MesDetailExist(string rcid)
         {
+            if (SimMode)
+            {
+                return true;
+            }
             StringBuilder strSql = new StringBuilder();
             strSql.Append("select count(1) from FT_MES_STEP_INFO_DETAIL");
             strSql.AppendFormat(" where RECID='{0}'", rcid);
@@ -647,6 +651,10 @@ namespace DevAccess
         }
         public bool AddMesBaseinfo(FT_MES_STEP_INFOModel model)
         {
+            if(SimMode)
+            {
+                return true;
+            }
             StringBuilder strSql = new StringBuilder();
             strSql.Append("insert into FT_MES_STEP_INFO(");
             strSql.Append("RECID,SERIAL_NUMBER,STEP_NUMBER,CHECK_RESULT,STEP_MARK,STATUS,TRX_TIME,LAST_MODIFY_TIME,DEFECT_CODES,USER_NAME,REASON)");
@@ -681,12 +689,7 @@ namespace DevAccess
                 {
                     try
                     {
-                        //if(this.dbConn.State != ConnectionState.Open)
-                        //{
-                        //    Console.WriteLine("开始连接MES数据库");
-                        //    this.dbConn.Open();
-                        //    Console.WriteLine("连接MES数据库成功");
-                        //}
+                       
                         if (conn.State != ConnectionState.Open)
                             conn.Open();
                         OracleTransaction m_OraTrans = conn.BeginTransaction();//创建事务对象
@@ -705,7 +708,6 @@ namespace DevAccess
                     }
                     catch (OracleException ex)
                     {
-                       // Console.WriteLine(this.mesdbConnstr);
                         throw ex;
                      
                     }
@@ -715,6 +717,10 @@ namespace DevAccess
         }
         public bool AddMesDetailinfo(FT_MES_STEP_INFO_DETAILModel model)
         {
+            if (SimMode)
+            {
+                return true;
+            }
             StringBuilder strSql = new StringBuilder();
             strSql.Append("insert into FT_MES_STEP_INFO_DETAIL(");
             strSql.Append("RECID,SERIAL_NUMBER,STEP_NUMBER,STATUS,TRX_TIME,LAST_MODIFY_TIME,DATA_NAME,DATA_VALUE)");
@@ -743,10 +749,6 @@ namespace DevAccess
                 {
                     try
                     {
-                        //if (this.dbConn.State != ConnectionState.Open)
-                        //{
-                        //    this.dbConn.Open();
-                        //}
                         if (conn.State != ConnectionState.Open)
                             conn.Open();
                         PrepareCommand(cmd, conn, strSql.ToString(), parameters);
@@ -791,10 +793,20 @@ namespace DevAccess
                
             }
         }
+        /// <summary>
+        /// MES下线许可查询web service服务接口调用
+        /// </summary>
+        /// <param name="paramArray"></param>
+        /// <param name="reStr"></param>
+        /// <returns>0:允许下线，1：禁止下线，3：异常发生</returns>
         public int MesAssemDown(string[] paramArray,ref string reStr)
         {
             try
             {
+                if (SimMode)
+                {
+                    return 0;
+                }
                 return WsMethodCall("assembleDown", paramArray, ref reStr);
 
             }
@@ -805,11 +817,67 @@ namespace DevAccess
 
             }
         }
+        /// <summary>
+        /// MES是否允许下线查询接口，包括查询MES数据库判断
+        /// </summary>
+        /// <param name="barcode"></param>
+        /// <param name="downQueryMesID"></param>
+        /// <param name="reStr"></param>
+        /// <returns>0:允许下线，1:禁止下线，2:无法确定，3：异常</returns>
+        public int MesDownEnabled(string mesLinID,string barcode,string downQueryMesID,ref string reStr)
+        {
+            try
+            {
+                if (SimMode)
+                {
+                    return 0;
+                }
+                int re = 0;
+                //1 先查询MES数据库，是否有错误发生
+                string sql = string.Format("select * from FT_MES_STEP_INFO where SERIAL_NUMBER='{0}' and STEP_NUMBER='{1}' order by TRX_TIME desc", barcode, downQueryMesID);
+                DataTable dt = ReadMesTable(sql);
+                if(dt.Rows.Count>0)
+                {
+                    int stat = int.Parse(dt.Rows[0]["STATUS"].ToString());
+                    if(stat == 2)
+                    {
+                        //mes处置结果为2，有错误发生，禁止下线
+                        reStr = dt.Rows[0]["REASON"].ToString();
+                        re = 1;
+                        return re;
+                    }
+                }
+                //2 查询MES服务接口
+                string[] wsParam = new string[] { barcode, mesLinID };
+                re=WsMethodCall("assembleDown", wsParam, ref reStr);
+                if(re == 1)
+                {
+                    re = 2;//最后一个关键工位信息为空的情况下，如果下线许可失败，可能是因为网络延迟，数据未及时上传到MES数据库
+
+                }
+                return re;
+
+            }
+            catch (Exception ex)
+            {
+                reStr = ex.Message;
+                return 3;
+
+            }
+        }
+
+        /// <summary>
+        /// 维修审核是否完成
+        /// </summary>
+        /// <param name="paramArray"></param>
+        /// <param name="reStr"></param>
+        /// <returns></returns>
         public int MesReAssemEnabled(string[] paramArray,ref string reStr)
         {
             
             try
             {
+               
                 return WsMethodCall("assembleRepair", paramArray, ref reStr);
 
             }
@@ -827,11 +895,15 @@ namespace DevAccess
         /// <param name="barcode"></param>
         /// <param name="reStr"></param>
         /// <returns>1: 下线，2：未下线，3：数据库无法访问</returns>
-        public int MesDowned(string barcode,ref string reStr)
+        public int MesDowned(string barcode,string mesDownStatName,ref string reStr)
         {
             try
             {
-                string sql = string.Format("select * from FT_MES_STEP_INFO where SERIAL_NUMBER='{0}' and STEP_NUMBER='{1}'", barcode, "RQ-ZA080");
+                if (SimMode)
+                {
+                    return 2;
+                }
+                string sql = string.Format("select * from FT_MES_STEP_INFO where SERIAL_NUMBER='{0}' and STEP_NUMBER='{1}'", barcode, mesDownStatName);
                 DataTable dt = ReadMesTable(sql);
                 if(dt.Rows.Count>0)
                 {

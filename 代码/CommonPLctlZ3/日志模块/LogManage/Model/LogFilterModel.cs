@@ -18,7 +18,7 @@ namespace LogManage
         public bool LikeQueryEnable { get; set; }
         public LogFilterModel()
         {
-            StartDate = System.DateTime.Now - (new TimeSpan(30, 0, 0, 0));
+            StartDate = System.DateTime.Now - (new TimeSpan(7, 0, 0, 0));
             EndDate = System.DateTime.Now+new TimeSpan(1,0,0,0);
             LogLevel = EnumLoglevel.提示.ToString();
             LogsrcStationName = "所有";

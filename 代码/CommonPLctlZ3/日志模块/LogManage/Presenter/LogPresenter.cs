@@ -62,44 +62,55 @@ namespace LogManage
             this.view = view;
         }
         public delegate string DelegateQueryLog(string strWhere, int pageSize, int pageIndex, bool orderAsc);
-        public void QueryLog(/*ref TimeSpan timeSpan*/)
+        public bool QueryLog(ref string reStr)
         {
-            SumLogPage = 0;
-            StringBuilder strWhere = new StringBuilder();
-            strWhere.AppendFormat("LogTime between '{0}' and '{1}' ",
-                logFilter.StartDate.ToString("yyyy-MM-dd 0:00:00"),
-                logFilter.EndDate.ToString("yyyy-MM-dd 0:00:00"));
-            if (logFilter.LogsrcStationName != "所有")
+            try
             {
-                strWhere.AppendFormat("and LogSourceObject = '{0}'", logFilter.LogsrcStationName);
+                SumLogPage = 0;
+                StringBuilder strWhere = new StringBuilder();
+                strWhere.AppendFormat("LogTime between '{0}' and '{1}' ",
+                    logFilter.StartDate.ToString("yyyy-MM-dd HH:mm"),
+                    logFilter.EndDate.ToString("yyyy-MM-dd HH:mm"));
+                if (logFilter.LogsrcStationName != "所有")
+                {
+                    strWhere.AppendFormat("and LogSourceObject = '{0}'", logFilter.LogsrcStationName);
+                }
+                if (logFilter.LogLevel != "所有")
+                {
+                    strWhere.AppendFormat("and LogLevel='{0}'", logFilter.LogLevel);
+                }
+                if (logFilter.LikeQueryEnable)
+                {
+                    strWhere.AppendFormat("and LogContent like '%{0}%'", logFilter.LikeContent);
+                }
+                logQueryCondition = strWhere.ToString();
+                int recordNum = logBll.GetRecordCount(strWhere.ToString());
+                int pageNum = recordNum / pageSize;
+                if (pageNum * pageSize < recordNum)
+                {
+                    pageNum++;
+                }
+                this.SumLogPage = pageNum;
+                this.CurLogPage = 1;
+                view.RefreshLogsumInfo(pageNum, pageSize);
+                LoadLog();
+                return true;
             }
-            if (logFilter.LogLevel != "所有")
+            catch (Exception ex)
             {
-                strWhere.AppendFormat("and LogLevel='{0}'", logFilter.LogLevel);
+                reStr = ex.Message;
+                Console.WriteLine(ex.Message);
+                return false;
             }
-            if (logFilter.LikeQueryEnable)
-            {
-                strWhere.AppendFormat("and LogContent like '%{0}%'", logFilter.LikeContent);
-            }
-            logQueryCondition = strWhere.ToString();
-            int recordNum = logBll.GetRecordCount(strWhere.ToString());
-            int pageNum = recordNum / pageSize;
-            if (pageNum * pageSize < recordNum)
-            {
-                pageNum++;
-            }
-            this.SumLogPage = pageNum;
-            this.CurLogPage = 1;
-            view.RefreshLogsumInfo(pageNum, pageSize);
-            LoadLog();
+          
            
         }
         public DataTable SynQueryLog()
         {
             StringBuilder strWhere = new StringBuilder();
             strWhere.AppendFormat("LogTime between '{0}' and '{1}' ",
-                logFilter.StartDate.ToString("yyyy-MM-dd 0:00:00"),
-                logFilter.EndDate.ToString("yyyy-MM-dd 0:00:00"));
+                logFilter.StartDate.ToString("yyyy-MM-dd HH:mm"),
+                logFilter.EndDate.ToString("yyyy-MM-dd HH:mm"));
             if (logFilter.LogsrcStationName != "所有")
             {
                 strWhere.AppendFormat("and LogSourceObject = '{0}'", logFilter.LogsrcStationName);

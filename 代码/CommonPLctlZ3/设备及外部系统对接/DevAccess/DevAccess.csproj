@@ -105,15 +105,31 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AipuAccess.cs" />
+    <Compile Include="AinuoAccess.cs" />
     <Compile Include="AirDetectFL295CRW.cs" />
     <Compile Include="AirDetectRWSim.cs" />
     <Compile Include="BarcodeRWHonevor.cs" />
     <Compile Include="BarcodeRWSim.cs" />
+    <Compile Include="BarcodeRWSR-750.cs" />
     <Compile Include="CommDevFactory.cs" />
     <Compile Include="ComputerInfor.cs" />
     <Compile Include="HFReaderIF.cs" />
+    <Compile Include="HKAccess.cs" />
     <Compile Include="MesDA.cs" />
     <Compile Include="MesDASim.cs" />
+    <Compile Include="MingmeiDeviceAcc.cs" />
+    <Compile Include="OcvAccess.cs" />
+    <Compile Include="OmlPlcRW\DataConvert.cs" />
+    <Compile Include="OmlPlcRW\IOMLFins.cs" />
+    <Compile Include="OmlPlcRW\ISocket.cs" />
+    <Compile Include="OmlPlcRW\OMLFinsTCPProtocol.cs" />
+    <Compile Include="OmlPlcRW\OMLFinsUDPProtocol.cs" />
+    <Compile Include="OmlPlcRW\OmlPlcRW.cs" />
+    <Compile Include="OmlPlcRW\STcpClient.cs" />
+    <Compile Include="OmlPlcRW\SUdpClient.cs" />
+    <Compile Include="OPCPlcRW.cs" />
+    <Compile Include="OPCWrapperAuto.cs" />
     <Compile Include="PlcRW485BD.cs" />
     <Compile Include="PLCRwMCPro.cs" />
     <Compile Include="PLCRWMx.cs" />
@@ -128,6 +144,7 @@
       <DependentUpon>Settings.settings</DependentUpon>
     </Compile>
     <Compile Include="ReaderWADLL.cs" />
+    <Compile Include="RfidCF.cs" />
     <Compile Include="RfidRWSim.cs" />
     <Compile Include="SgRfidRW.cs" />
     <Compile Include="SgUrb3RW.cs" />
@@ -136,6 +153,7 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>Reference.map</DependentUpon>
     </Compile>
+    <Compile Include="WqRfidUdp.cs" />
     <Compile Include="WqwlRfidRW.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -174,6 +192,17 @@
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />
+  </ItemGroup>
+  <ItemGroup>
+    <COMReference Include="OPCAutomation">
+      <Guid>{28E68F91-8D75-11D1-8DC3-3C302A000000}</Guid>
+      <VersionMajor>1</VersionMajor>
+      <VersionMinor>0</VersionMinor>
+      <Lcid>0</Lcid>
+      <WrapperTool>tlbimp</WrapperTool>
+      <Isolated>False</Isolated>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </COMReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

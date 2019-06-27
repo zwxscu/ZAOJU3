@@ -56,7 +56,11 @@ namespace LogManage
         private void buttonLogRefresh_Click(object sender, EventArgs e)
         {
             presenter.LogFilter.LogLevel = this.comboBoxLevel.Text;
-            presenter.QueryLog();
+            string reStr = "";
+            if(!presenter.QueryLog(ref reStr))
+            {
+                MessageBox.Show(reStr);
+            }
             //TimeSpan timeSpan = new TimeSpan();
           //  DataTable dt = presenter.QueryLog(ref timeSpan);
            // string timeCost = string.Format("用时：{0}:{1}:{2}.{3}", timeSpan.Hours, timeSpan.Minutes, timeSpan.Seconds, timeSpan.Milliseconds);

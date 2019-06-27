@@ -9,7 +9,9 @@ namespace DevInterface
     {
         MIT_FX,
         MIT_Q,
-        MIT_L
+        MIT_L,
+        OML_TCP,
+        OML_UDP
     }
     public enum EnumDevCommStatus
     {
@@ -59,6 +61,7 @@ namespace DevInterface
     public interface IPlcRW
     {
         Int64 PlcStatCounter { get; }
+        string PlcRole { get; set; }
         /// <summary>
         /// PLC id，自定义
         /// </summary>
@@ -69,6 +72,8 @@ namespace DevInterface
         bool IsConnect { get; }
 
         int StationNumber { get; set; }
+        Int16[] Db1Vals { get; set; }
+        Int16[] Db2Vals { get; set; }
         /// <summary>
         /// 连接PLC
         /// </summary>
@@ -101,10 +106,8 @@ namespace DevInterface
         /// <returns></returns>
         bool WriteDB(string addr,int val);
         bool WriteMultiDB(string addr, int blockNum, short[] vals);
-
-        void Init();
-        void Exit();
-        event EventHandler<PlcReLinkArgs> eventLinkLost;
+        void PlcRWStatUpdate();
+       // event EventHandler<PlcReLinkArgs> eventLinkLost;
      //   event EventHandler<LogEventArgs> eventLogDisp;
     }
 }

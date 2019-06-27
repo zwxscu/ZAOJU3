@@ -91,6 +91,7 @@ namespace DevAccess
                 byte[] recvBytes = null;
                 re = ReaderIF.ReadUserCfg(rfidID, ref cfg,ref recvBytes);
             }
+            ReaderIF.ClearRecvBuffer();
             this.rfidCfg = cfg;
             return re;
         }
@@ -122,6 +123,7 @@ namespace DevAccess
                     re = ReaderIF.ReadUserCfg(this.readerID, ref cfg, ref recvBytes);
                     tryCount++;
                 }
+                ReaderIF.ClearRecvBuffer();
                 if (re == SygoleHFReaderIF.EnumREStatus.RW_SUCCESS && cfg != null)
                 {
                     this.rfidCfg = cfg;
@@ -133,6 +135,7 @@ namespace DevAccess
                     isOpened = false;
                     return false;
                 }
+               
            }
             else
             {
@@ -396,11 +399,16 @@ namespace DevAccess
                 {
                     uidStr += UIDBytes[i].ToString("X2");
                 }
-                
+                if(uidStr.Substring(0,4)=="0000")
+                {
+                    uidStr = "";
+                }
+                ReaderIF.ClearRecvBuffer();
                 return uidStr;
             }
             else
             {
+                ReaderIF.ClearRecvBuffer();
                 return string.Empty;
             }
         }
@@ -411,7 +419,7 @@ namespace DevAccess
             string outString = "";
             if (data < 16)
                 outString += "0";
-            outString += data.ToString("X");
+            outString += data.ToString("X2");
             return outString;
         }
 

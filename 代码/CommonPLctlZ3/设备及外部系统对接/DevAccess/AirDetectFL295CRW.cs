@@ -68,6 +68,10 @@ namespace DevAccess
             }  
           
         }
+        public void StopMonitor()
+        {
+            this.pauseFlag = true;
+        }
         /// <summary>
         /// 开始检测
         /// </summary>

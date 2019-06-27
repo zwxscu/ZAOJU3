@@ -102,13 +102,16 @@ namespace LineNodes
                 // node.LogRecorder.AddDebugLog(node.NodeName, dispCommInfo);
                 CurrentStat.StatDescribe = string.Format("漏项检查周期:{0}毫秒", (int)ts.TotalMilliseconds);
             }
-
+            if(this.db2Vals[1]==1) //纸箱到位
+            {
+                boxPrepareOK = true;
+            }
             if (!NodeStatParse(ref reStr))
             {
                 return false;
             }
            // Console.WriteLine("P3");
-            if (this.db2Vals[1] == 0 && boxPrepareOK)
+            if ((this.db2Vals[1] == 0) && (currentTaskPhase>1) && boxPrepareOK)
             {
                 //抓取完毕后，纸箱复位（主要是非正常流程下人工取走纸箱）
                 DevCmdReset();
@@ -160,8 +163,6 @@ namespace LineNodes
                 case 2:
                     {
                         db1ValsToSnd[32] = 1;//流程锁定
-                        
-                        
                         if (this.currentStat.Status == EnumNodeStatus.设备故障)
                         {
                             break;
@@ -205,6 +206,7 @@ namespace LineNodes
                             SetMesQueryStat(this.currentStat.ProductBarcode, 1);
 
                             //检查是否已经下线,MES离线模式下不判断
+                            logRecorder.AddDebugLog(nodeName, "查询MES是否已经下线:" + this.currentStat.ProductBarcode);
                             if(!SysCfgModel.MesOfflineMode)
                             {
                                 int mesDown = mesDA.MesDowned(this.currentStat.ProductBarcode,mesNodeID, ref reStr);
@@ -409,9 +411,14 @@ namespace LineNodes
                             //校验纸箱条码跟主机条码是否一致
                             if (boxBarcode != this.currentStat.ProductBarcode)
                             {
-                                db1ValsToSnd[0] = barcodeCompareFailed;
                                 this.currentStat.StatDescribe = "纸箱跟主机条码不同";
                                 currentTaskDescribe = string.Format("纸箱条码校验错误，主机：{0},纸箱{1}", this.currentStat.ProductBarcode, boxBarcode);
+                                if (db1ValsToSnd[0] != barcodeCompareFailed)
+                                {
+                                    logRecorder.AddDebugLog(nodeName, currentTaskDescribe);
+                                }
+                                db1ValsToSnd[0] = barcodeCompareFailed;
+                              
                                 break;
                             }
                             logRecorder.AddDebugLog(nodeName, "纸箱条码验证通过：" + boxBarcode);
