@@ -34,7 +34,7 @@ namespace LogManage
             this.comboBoxNode.Items.Add("所有");
             this.comboBoxNode.Items.AddRange(nodeNames.ToArray());
         
-            this.comboBoxNode.SelectedIndex = 0;
+            this.comboBoxNode.Text="所有";
         }
         #region UI事件
         
@@ -205,55 +205,71 @@ namespace LogManage
         }
 
         private delegate void DelegateExportLog(DataTable dt, string fileName, string sheetName);
+        private delegate void DelegateExportCsv(DataTable dt, string fileName);
         private void OnExportLog(DataTable dt)
         {
             SaveFileDialog dlg = new SaveFileDialog();
-            dlg.Filter = "excel files (*.xlsx)|*.xlsx";
+            dlg.Filter = "csv files (*.csv)|*.csv";
             if (dlg.ShowDialog() == DialogResult.OK)
             {
+                string fileName = dlg.FileName;
+                DelegateExportCsv dlgtExportLog = new DelegateExportCsv(AsyExportCsv);
+                waitDlg = new WaitDlg();
+                dlgtExportLog.BeginInvoke(dt, fileName, CallbackExportlogOK, dlgtExportLog);
+                waitDlg.ShowDialog();
 
-                try
-                {
-                    string fileName = dlg.FileName;
-                    string sheetName = "Log";
-                    DelegateExportLog dlgtExportLog = new DelegateExportLog(AsyExportLog);
-                    dlgtExportLog.BeginInvoke(dt, fileName, sheetName,CallbackExportlogOK, dlgtExportLog);
-                    waitDlg = new WaitDlg();
-                    waitDlg.ShowDialog();
-                    //CreateExcelFile(fileName, sheetName);
-                    ////string strConn = "Provider=Microsoft.Jet.OLEDB.4.0;" +
-                    ////"Data Source=" + fileName + ";" +
-                    ////"Extended Properties='Excel 8.0; HDR=Yes; IMEX=2'";
-                    //string strConn = "Provider=Microsoft.ACE.OLEDB.12.0;" +
-                    //"Data Source=" + fileName + ";" +
-                    //"Extended Properties='Excel 12.0; HDR=Yes; IMEX=0'";
-                    //using (OleDbConnection ole_conn = new OleDbConnection(strConn))
-                    //{
-                    //    ole_conn.Open();
-                    //    using (OleDbCommand ole_cmd = ole_conn.CreateCommand())
-                    //    {
-                    //        foreach (DataRow dr in dt.Rows)
-                    //        {
-                    //            string logContent = dr["内容"].ToString();
-                    //            logContent = logContent.Substring(0, Math.Min(255, logContent.Count()));
-                    //            ole_cmd.CommandText = string.Format(@"insert into [{0}$](日志ID,内容,类别,日志来源,时间)values('{1}','{2}','{3}','{4}','{5}')", sheetName, dr["日志ID"].ToString(), logContent, dr["类别"].ToString(), dr["日志来源"].ToString(), dr["时间"].ToString());
-                    //            ole_cmd.ExecuteNonQuery();
-                    //        }
-                          
-                    //        MessageBox.Show("数据导出成功......");
-                    //    }
-                    //}
-                }
-                catch (Exception ex)
-                {
-                    MessageBox.Show(ex.ToString());
-                }
-               
             }
         }
+        //private void OnExportLog(DataTable dt)
+        //{
+        //    SaveFileDialog dlg = new SaveFileDialog();
+        //    dlg.Filter = "excel files (*.xlsx)|*.xlsx";
+        //    if (dlg.ShowDialog() == DialogResult.OK)
+        //    {
+
+        //        try
+        //        {
+        //            string fileName = dlg.FileName;
+        //            string sheetName = "Log";
+        //            DelegateExportLog dlgtExportLog = new DelegateExportLog(AsyExportLog);
+        //            dlgtExportLog.BeginInvoke(dt, fileName, sheetName,CallbackExportlogOK, dlgtExportLog);
+        //            waitDlg = new WaitDlg();
+        //            waitDlg.ShowDialog();
+        //            //CreateExcelFile(fileName, sheetName);
+        //            ////string strConn = "Provider=Microsoft.Jet.OLEDB.4.0;" +
+        //            ////"Data Source=" + fileName + ";" +
+        //            ////"Extended Properties='Excel 8.0; HDR=Yes; IMEX=2'";
+        //            //string strConn = "Provider=Microsoft.ACE.OLEDB.12.0;" +
+        //            //"Data Source=" + fileName + ";" +
+        //            //"Extended Properties='Excel 12.0; HDR=Yes; IMEX=0'";
+        //            //using (OleDbConnection ole_conn = new OleDbConnection(strConn))
+        //            //{
+        //            //    ole_conn.Open();
+        //            //    using (OleDbCommand ole_cmd = ole_conn.CreateCommand())
+        //            //    {
+        //            //        foreach (DataRow dr in dt.Rows)
+        //            //        {
+        //            //            string logContent = dr["内容"].ToString();
+        //            //            logContent = logContent.Substring(0, Math.Min(255, logContent.Count()));
+        //            //            ole_cmd.CommandText = string.Format(@"insert into [{0}$](日志ID,内容,类别,日志来源,时间)values('{1}','{2}','{3}','{4}','{5}')", sheetName, dr["日志ID"].ToString(), logContent, dr["类别"].ToString(), dr["日志来源"].ToString(), dr["时间"].ToString());
+        //            //            ole_cmd.ExecuteNonQuery();
+        //            //        }
+                          
+        //            //        MessageBox.Show("数据导出成功......");
+        //            //    }
+        //            //}
+        //        }
+        //        catch (Exception ex)
+        //        {
+        //            MessageBox.Show(ex.ToString());
+        //        }
+               
+        //    }
+        //}
         private void CallbackExportlogOK(IAsyncResult ar)
         {
             //结束
+            System.Threading.Thread.Sleep(500);
             waitDlg.Finished = true;
           //  MessageBox.Show("数据导出成功......");
         }
@@ -296,6 +312,66 @@ namespace LogManage
                 Console.WriteLine(ex.ToString());
             }
           
+        }
+        private void AsyExportCsv(DataTable dt, string fileName)
+        {
+            try
+            {
+                FileStream fs;
+                if (!File.Exists(fileName))
+                {
+                    fs = new FileStream(fileName, FileMode.CreateNew, FileAccess.ReadWrite);
+                }
+                else
+                {
+                    File.Delete(fileName);
+                    fs = new FileStream(fileName, FileMode.CreateNew, FileAccess.ReadWrite);
+                  
+                }
+                StreamWriter sw = new StreamWriter(fs, Encoding.UTF8);
+                //写标题
+                int iColCount = dt.Columns.Count;
+                for (int i = 0; i < iColCount; i++)
+                {
+                    sw.Write(dt.Columns[i].ToString());
+                    //sw.Write(dt.Columns[i]);
+                    if (i < iColCount - 1)
+                    {
+                        sw.Write(",");
+                        //sw.Write("|");
+                    }
+                }
+                sw.Write(sw.NewLine);
+                //写内容
+                foreach (DataRow dr in dt.Rows)
+                {
+                    for (int i = 0; i < iColCount; i++)
+                    {
+                        if (!Convert.IsDBNull(dr[i]))
+                        {
+                            sw.Write(dr[i].ToString().Replace(',', '，'));
+                        }
+                        else
+                        {
+                            sw.Write(" ");
+                        }
+                        if (i < iColCount - 1)
+                        {
+                            sw.Write(",");
+                          
+                        }
+                    }
+                    sw.Write(sw.NewLine);
+                }
+                sw.Flush();
+                sw.Close();
+                fs.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+
+            }
         }
         private void btnExportCurpage_Click(object sender, EventArgs e)
         {
